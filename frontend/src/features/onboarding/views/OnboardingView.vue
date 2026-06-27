@@ -29,9 +29,9 @@ const codeSchema = toTypedSchema(verificationCodeSchema);
 const { errors: identityErrors, defineField: defineIdentityField, handleSubmit: handleIdentitySubmit } = useForm({
   validationSchema: identitySchema,
   initialValues: {
-    name: 'Derya Kaya',
-    university: 'Yildiz Teknik Universitesi',
-    email: 'derya@std.yildiz.edu.tr',
+    name: '',
+    university: '',
+    email: '',
     referralCode: '',
   },
 });

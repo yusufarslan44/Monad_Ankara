@@ -1,5 +1,12 @@
 import { dashboardApi } from '@/shared/adapters/dashboardApi';
 import { poolApi } from '@/shared/adapters/poolApi';
+import { walletAdapter } from '@/shared/adapters/walletAdapter';
+import {
+  encodeDeposit,
+  encodeWithdraw,
+  LENDING_POOL_ADDRESS,
+  toHexWei,
+} from '@/shared/lib/contractHelpers';
 import type { PoolDepositInput } from '@/shared/types/domain';
 import { mockCampusApi } from '@/shared/mocks/mockCampusState';
 
@@ -27,8 +34,25 @@ export const dataAdapter = {
   getPoolSnapshot: (address?: string) =>
     IS_TEST ? mockCampusApi.getPoolSnapshot() : poolApi.getPoolSnapshot(withAddress(address)),
   getPoolQuote: (amountMON: number, lockDays: number) => mockCampusApi.getPoolQuote(amountMON, lockDays),
-  deposit: (input: PoolDepositInput) => mockCampusApi.deposit(input),
-  withdraw: (depositId: string) => mockCampusApi.withdraw(depositId),
+  deposit: IS_TEST
+    ? (input: PoolDepositInput) => mockCampusApi.deposit(input)
+    : async (input: PoolDepositInput) => {
+        const txHash = await walletAdapter.sendContractTx({
+          to: LENDING_POOL_ADDRESS,
+          data: encodeDeposit(),
+          value: toHexWei(input.amountMON),
+        });
+        return { txHash };
+      },
+  withdraw: IS_TEST
+    ? (depositId: string) => mockCampusApi.withdraw(depositId)
+    : async (input: { amountMON: number }) => {
+        const txHash = await walletAdapter.sendContractTx({
+          to: LENDING_POOL_ADDRESS,
+          data: encodeWithdraw(input.amountMON),
+        });
+        return { txHash };
+      },
   getLoanQuote: (amountMON: number) => mockCampusApi.getLoanQuote(amountMON),
   submitLoanRequest: (amountMON: number, purpose: string) =>
     mockCampusApi.submitLoanRequest(amountMON, purpose),

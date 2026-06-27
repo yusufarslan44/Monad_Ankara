@@ -380,4 +380,33 @@ export const walletAdapter = {
 
     return attachProviderListeners(listener);
   },
+  async sendContractTx(params: {
+    to: string;
+    data: string;
+    value?: string;
+  }): Promise<string> {
+    if (IS_TEST) {
+      return '0x' + '0'.repeat(64);
+    }
+
+    const provider = getMetaMaskProvider();
+    if (!provider) throw new Error('MetaMask bulunamadi.');
+
+    const accounts = await provider.request<string[]>({ method: 'eth_accounts' });
+    if (!accounts[0]) throw new Error('Cuzdan bagli degil.');
+
+    const txHash = await provider.request<string>({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: accounts[0],
+          to: params.to,
+          data: params.data,
+          ...(params.value ? { value: params.value } : {}),
+        },
+      ],
+    });
+
+    return txHash;
+  },
 };

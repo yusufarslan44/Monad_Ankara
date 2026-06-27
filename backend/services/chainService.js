@@ -16,6 +16,7 @@ const STUDENT_ID_ABI = [
   "function register(address student)",
   "function isRegistered(address student) view returns (bool)",
   "function revoke(address student)",
+  "function isAdmin(address) view returns (bool)",
 ];
 
 // Lazy init — modul require edildiginde degil, ilk kullanildiginda kurulur.
@@ -61,6 +62,19 @@ function getContract() {
   const adminWallet = new ethers.Wallet(process.env.ADMIN_PRIVATE_KEY, provider);
 
   _contract = new ethers.Contract(address, STUDENT_ID_ABI, adminWallet);
+
+  // Startup'ta admin yetkisini doğrula (asenkron, bloklamamak için .catch ile)
+  _contract.isAdmin(adminWallet.address).then((ok) => {
+    if (!ok) {
+      console.error(
+        `[chainService] UYARI: ${adminWallet.address} StudentID kontratinda admin degil! ` +
+        `register() cagirilari NotAdmin() ile revert edecek.`
+      );
+    } else {
+      console.log(`[chainService] Admin dogrulandı: ${adminWallet.address}`);
+    }
+  }).catch(() => {});
+
   return _contract;
 }
 
