@@ -54,7 +54,7 @@ describe('router guards', () => {
     expect(router.currentRoute.value.name).toBe('dashboard');
   });
 
-  it('prevents student users from opening the pool route', async () => {
+  it('allows student users to open the pool route after onboarding', async () => {
     const session = useSessionStore();
 
     const hydratePromise = session.hydrate();
@@ -83,7 +83,7 @@ describe('router guards', () => {
     await navigation;
     await flushPromises();
 
-    expect(router.currentRoute.value.name).toBe('dashboard');
+    expect(router.currentRoute.value.name).toBe('pool');
   });
 
   it('keeps investor users inside the pool flow', async () => {

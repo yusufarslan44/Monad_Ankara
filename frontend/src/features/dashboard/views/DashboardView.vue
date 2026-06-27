@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
-import { ArrowRight, WalletCards } from 'lucide-vue-next';
+import { ArrowRight, PiggyBank, WalletCards } from 'lucide-vue-next';
 import { useDashboardQuery } from '@/shared/composables/useAppQueries';
 import { formatMON } from '@/shared/lib/formatters';
 import BaseButton from '@/shared/components/BaseButton.vue';
@@ -22,6 +22,10 @@ const primaryAction = computed(() => {
     ? { label: 'Borc odeme', href: '/uygulama/odeme' }
     : { label: 'Hemen borc al', href: '/uygulama/borc-al' };
 });
+
+const userPoolTotal = computed(
+  () => data.value?.poolPosition.userDeposits.reduce((sum, deposit) => sum + deposit.amountMON, 0) ?? 0,
+);
 </script>
 
 <template>
@@ -75,6 +79,24 @@ const primaryAction = computed(() => {
         </div>
       </BaseCard>
     </section>
+
+    <RouterLink to="/uygulama/havuz" class="block">
+      <BaseCard class="transition-colors hover:bg-cream-50/50">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-start gap-3">
+            <div class="grid h-11 w-11 place-items-center rounded-2xl bg-coral-100 text-coral-500">
+              <PiggyBank class="h-5 w-5" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-ink-700">Havuza yatirdigim</p>
+              <p class="mt-1 font-display text-2xl font-bold text-ink-950">{{ formatMON(userPoolTotal) }} MON</p>
+              <p class="mt-1 text-xs text-ink-600">APY: %{{ data.poolPosition.globalApyBps / 100 }}</p>
+            </div>
+          </div>
+          <ArrowRight class="h-5 w-5 text-ink-400" />
+        </div>
+      </BaseCard>
+    </RouterLink>
 
     <!-- Son hareketler -->
     <BaseCard>

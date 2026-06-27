@@ -29,9 +29,9 @@ const codeSchema = toTypedSchema(verificationCodeSchema);
 const { errors: identityErrors, defineField: defineIdentityField, handleSubmit: handleIdentitySubmit } = useForm({
   validationSchema: identitySchema,
   initialValues: {
-    name: '',
-    university: '',
-    email: '',
+    name: 'Derya Kaya',
+    university: 'Yildiz Teknik Universitesi',
+    email: 'derya@std.yildiz.edu.tr',
     referralCode: '',
   },
 });
@@ -48,6 +48,9 @@ const {
   resetForm: resetCodeForm,
 } = useForm({
   validationSchema: codeSchema,
+  initialValues: {
+    code: '123456',
+  },
 });
 
 const [code, codeAttrs] = defineCodeField('code');
@@ -139,7 +142,11 @@ const onIdentitySubmit = handleIdentitySubmit(async (values) => {
 
   try {
     await session.startVerification(values.name, values.university, values.email, values.referralCode || undefined);
-    resetCodeForm();
+    resetCodeForm({
+      values: {
+        code: '123456',
+      },
+    });
   } catch (error) {
     submissionError.value = error instanceof Error ? error.message : 'Kod gonderilemedi. Lutfen tekrar dene.';
   }

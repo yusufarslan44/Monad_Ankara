@@ -36,27 +36,17 @@ describe('onboarding integration', () => {
     await vi.runAllTimersAsync();
     await flushPromises();
 
-    // 2. Kimlik formunu doldur ve gonder
+    // 2. Kimlik formu demo verileriyle dolu gelir, direkt gonder
     const identityForm = wrapper.find('form');
     expect(identityForm.exists()).toBe(true);
-
-    const nameInput = wrapper.find('input[autocomplete="name"]');
-    const universityInput = wrapper.find('input[autocomplete="organization"]');
-    const emailInput = wrapper.find('input[type="email"]');
-
-    if (nameInput.exists()) await nameInput.setValue('Test Kullanici');
-    if (universityInput.exists()) await universityInput.setValue('Test Universitesi');
-    if (emailInput.exists()) await emailInput.setValue('test@std.test.edu.tr');
 
     await identityForm.trigger('submit');
     await vi.runAllTimersAsync();
     await flushPromises();
 
-    // 3. Dogrulama kodunu gir ve gonder
+    // 3. Dogrulama kodu demo degeriyle hazir gelir, direkt gonder
     const codeInput = wrapper.find('input[placeholder="123456"]');
     expect(codeInput.exists()).toBe(true);
-
-    await codeInput.setValue('123456');
     await vi.runAllTimersAsync();
     await flushPromises();
 
