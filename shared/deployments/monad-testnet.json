@@ -1,9 +1,11 @@
 {
-  "contract": "Counter",
-  "address": "0x9f4202C0B16bD96ce821bFCC0C4BbA9469522635",
   "chainId": 10143,
-  "txHash": "0x33a98e0da5741eba05633dfa393fd599346058dde165e6a86582b3ea0064b59e",
-  "block": 40867969,
-  "deployedAt": "2026-06-27T00:00:00Z",
-  "deployer": "0x10562c789bb833c1930cdc7115d4fc0c4d32ba73"
+  "deployedAt": "deploy.sh çalıştırıldığında otomatik güncellenir",
+  "deployer": "",
+  "txHash": "",
+  "block": 0,
+  "contracts": {
+    "StudentID": "deploy sonrası buraya gelir",
+    "LendingPool": "deploy sonrası buraya gelir"
+  }
 }
