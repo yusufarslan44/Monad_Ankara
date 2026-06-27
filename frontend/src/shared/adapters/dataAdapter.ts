@@ -1,8 +1,11 @@
+import { parseEther } from 'ethers';
 import { dashboardApi } from '@/shared/adapters/dashboardApi';
 import { poolApi } from '@/shared/adapters/poolApi';
 import { walletAdapter } from '@/shared/adapters/walletAdapter';
 import {
+  encodeBorrow,
   encodeDeposit,
+  encodeRepay,
   encodeWithdraw,
   LENDING_POOL_ADDRESS,
   toHexWei,
@@ -54,8 +57,26 @@ export const dataAdapter = {
         return { txHash };
       },
   getLoanQuote: (amountMON: number) => mockCampusApi.getLoanQuote(amountMON),
-  submitLoanRequest: (amountMON: number, purpose: string) =>
-    mockCampusApi.submitLoanRequest(amountMON, purpose),
-  submitRepayment: (amountMON: number) => mockCampusApi.submitRepayment(amountMON),
+  submitLoanRequest: IS_TEST
+    ? (amountMON: number, purpose: string) => mockCampusApi.submitLoanRequest(amountMON, purpose)
+    : async (amountMON: number, purpose: string) => {
+        const referrer = '0x0000000000000000000000000000000000000000';
+        const amountWei = parseEther(String(amountMON));
+        const txHash = await walletAdapter.sendContractTx({
+          to: LENDING_POOL_ADDRESS,
+          data: encodeBorrow(amountWei, referrer),
+        });
+        return { txHash };
+      },
+  submitRepayment: IS_TEST
+    ? (amountMON: number) => mockCampusApi.submitRepayment(amountMON)
+    : async (amountMON: number) => {
+        const txHash = await walletAdapter.sendContractTx({
+          to: LENDING_POOL_ADDRESS,
+          data: encodeRepay(),
+          value: toHexWei(amountMON),
+        });
+        return { txHash };
+      },
   reset: () => mockCampusApi.reset(),
 };
