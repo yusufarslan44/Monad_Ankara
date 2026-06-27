@@ -1,0 +1,48 @@
+name: Deploy Production
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to deploy
+        required: true
+        default: main
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          TARGET_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.event.workflow_run.head_branch }}
+          APP_DIR: ${{ vars.PRODUCTION_APP_DIR }}
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          script_stop: true
+          envs: TARGET_REF,APP_DIR
+          script: |
+            set -euo pipefail
+            APP_DIR="${APP_DIR:-/home/yusuf/projects/Monad_Ankara}"
+            TARGET_REF="${TARGET_REF:-main}"
+            cd "$APP_DIR"
+            git fetch origin "$TARGET_REF"
+            git checkout "$TARGET_REF"
+            git pull --ff-only origin "$TARGET_REF"
+            bash scripts/deploy-production.sh
