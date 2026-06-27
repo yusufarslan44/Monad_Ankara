@@ -166,10 +166,16 @@ const getDisconnectedSnapshot = async (wallet: WalletState) => {
 const readWalletState = async (
   provider: EthereumProvider,
   accountsOverride?: string[],
+  chainIdOverride?: string,
 ): Promise<WalletState> => {
-  const chainId = await provider.request<string>({ method: 'eth_chainId' });
-  const accounts =
-    accountsOverride ?? (await provider.request<string[]>({ method: 'eth_accounts' }));
+  const [chainId, accounts] = await Promise.all([
+    chainIdOverride
+      ? Promise.resolve(chainIdOverride)
+      : provider.request<string>({ method: 'eth_chainId' }),
+    accountsOverride
+      ? Promise.resolve(accountsOverride)
+      : provider.request<string[]>({ method: 'eth_accounts' }),
+  ]);
   const address = accounts[0];
   const supported = isSupportedChain(chainId);
 
@@ -267,8 +273,9 @@ const attachProviderListeners = (listener: WalletListener) => {
     listener(wallet);
   };
 
-  const syncChain = async () => {
-    const wallet = await readWalletState(provider);
+  const syncChain = async (newChainId: unknown) => {
+    const chainId = typeof newChainId === 'string' ? newChainId : undefined;
+    const wallet = await readWalletState(provider, undefined, chainId);
     listener(wallet);
   };
 
