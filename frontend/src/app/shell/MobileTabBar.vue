@@ -30,7 +30,7 @@ const route = useRoute();
               class="h-4 w-4 transition-transform duration-200 ease-[var(--ease-fluid)]"
               :class="route.path === item.to ? 'scale-110' : ''"
             />
-            <span class="transition-transform duration-200 ease-[var(--ease-fluid)]" :class="route.path === item.to ? '-translate-y-0.5' : ''">
+            <span class="transition-transform duration-200 ease-[var(--ease-fluid)] whitespace-nowrap text-center" :class="route.path === item.to ? '-translate-y-0.5' : ''">
               {{ item.label }}
             </span>
           </RouterLink>
@@ -41,7 +41,7 @@ const route = useRoute();
             @click="emit('more')"
           >
             <MoreHorizontal class="h-4 w-4" />
-            <span>Daha</span>
+            <span class="whitespace-nowrap">Daha</span>
           </button>
         </li>
       </ul>

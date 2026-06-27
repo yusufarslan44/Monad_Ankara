@@ -48,6 +48,9 @@ const {
   resetForm: resetCodeForm,
 } = useForm({
   validationSchema: codeSchema,
+  initialValues: {
+    code: '',
+  },
 });
 
 const [code, codeAttrs] = defineCodeField('code');
@@ -139,7 +142,11 @@ const onIdentitySubmit = handleIdentitySubmit(async (values) => {
 
   try {
     await session.startVerification(values.name, values.university, values.email, values.referralCode || undefined);
-    resetCodeForm();
+    resetCodeForm({
+      values: {
+        code: '',
+      },
+    });
   } catch (error) {
     submissionError.value = error instanceof Error ? error.message : 'Kod gonderilemedi. Lutfen tekrar dene.';
   }
@@ -206,6 +213,10 @@ watch(
     <div class="mx-auto max-w-[28rem]">
       <section class="surface-card p-5">
         <div class="space-y-3">
+          <div class="flex items-center gap-3 mb-6">
+            <img src="/logo.png" alt="Monbank Logo" class="h-10 w-10 object-contain rounded-xl shadow-md" />
+            <span class="font-display text-xl font-bold text-ink-950 tracking-tight">Monbank</span>
+          </div>
           <span class="label-chip">{{ isInvestorMode ? 'Yatirimci' : isLoginIntent ? 'Giris' : 'Kayit' }}</span>
           <h1 class="font-display text-[2rem] font-bold text-ink-950">
             {{ isInvestorMode ? 'Cuzdani bagla' : isLoginIntent ? 'Hesabina gir' : 'Kampus kimligini olustur' }}

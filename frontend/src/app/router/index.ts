@@ -109,7 +109,7 @@ router.beforeEach(async (to) => {
   if (isInvestorMode.value && !isInvestorAllowedPath(to.path)) {
     if (isWalletReady.value) {
       return {
-        name: 'pool',
+        name: 'dashboard',
       };
     }
 
@@ -119,24 +119,10 @@ router.beforeEach(async (to) => {
     };
   }
 
-  if (!isInvestorMode.value && to.name === 'pool') {
-    if (isAppReady.value) {
-      return {
-        name: 'dashboard',
-      };
-    }
-
-    return {
-      name: 'onboarding',
-    };
-  }
-
   if (to.meta.requiresReady && !isAppReady.value) {
     if (isInvestorMode.value) {
       if (isWalletReady.value) {
-        return {
-          name: 'pool',
-        };
+        return true;
       }
 
       return {
@@ -165,7 +151,7 @@ router.beforeEach(async (to) => {
 
   if (to.name === 'onboarding' && isInvestorMode.value && isWalletReady.value) {
     return {
-      name: 'pool',
+      name: 'dashboard',
     };
   }
 

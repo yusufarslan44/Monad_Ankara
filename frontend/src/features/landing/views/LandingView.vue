@@ -32,34 +32,38 @@ const pillars = [
       <section class="surface-card overflow-hidden p-6">
         <div class="grid gap-8">
           <div>
+            <div class="flex items-center gap-3 mb-6">
+              <img src="/logo.png" alt="Monbank Logo" class="h-10 w-10 object-contain rounded-xl shadow-md" />
+              <span class="font-display text-xl font-bold text-ink-950 tracking-tight">Monbank</span>
+            </div>
             <span class="label-chip">Kampus ici nano-lending ekosistemi</span>
             <h1 class="mt-5 max-w-[12ch] font-display text-5xl font-bold text-ink-950">
               500 TL'lik ihtiyac icin banka bekleme devri bitsin.
             </h1>
             <p class="mt-5 max-w-[62ch] text-base text-ink-800">
-              KampusMON, universite ogrencilerinin anlik nakit ihtiyacini Monad uzerinde
+              Monbank, universite ogrencilerinin anlik nakit ihtiyacini Monad uzerinde
               teminatsiz, seffaf ve sosyal guven tabanli bir deneyime donusturur.
             </p>
             <div class="mt-8 flex flex-col gap-3">
-              <RouterLink to="/uygulama?mod=kayit">
-                <BaseButton>
+              <RouterLink to="/uygulama?mod=kayit" class="block w-full">
+                <BaseButton block>
                   Kayit ol
                   <ArrowRight class="h-4 w-4" />
                 </BaseButton>
               </RouterLink>
-              <RouterLink to="/uygulama?mod=giris">
-                <BaseButton variant="ghost">
+              <RouterLink to="/uygulama?mod=giris" class="block w-full">
+                <BaseButton variant="ghost" block>
                   Giris yap
                 </BaseButton>
               </RouterLink>
-              <RouterLink to="/uygulama?rol=yatirimci">
-                <BaseButton variant="secondary">
+              <RouterLink to="/uygulama?rol=yatirimci" class="block w-full">
+                <BaseButton variant="secondary" block>
                   Yatirimci girisi
                   <PiggyBank class="h-4 w-4" />
                 </BaseButton>
               </RouterLink>
-              <a href="#neden-monad">
-                <BaseButton variant="ghost">Neden Monad?</BaseButton>
+              <a href="#neden-monad" class="block w-full">
+                <BaseButton variant="ghost" block>Neden Monad?</BaseButton>
               </a>
             </div>
             <dl class="mt-10 grid gap-4">

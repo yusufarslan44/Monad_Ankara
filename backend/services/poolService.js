@@ -75,13 +75,11 @@ async function getPoolSnapshot(address) {
 
   try {
     const contract = getLendingPoolContract();
-    const [depositWei, totalDepositedWei, totalBorrowedWei, availableLiquidityWei, apyBpsWei] = await Promise.all([
-      contract.deposits(normalizedAddress),
-      contract.totalDeposited(),
-      contract.totalBorrowed(),
-      contract.availableLiquidity(),
-      contract.ANNUAL_RATE_BPS(),
-    ]);
+    const depositWei = await contract.deposits(normalizedAddress);
+    const totalDepositedWei = await contract.totalDeposited();
+    const totalBorrowedWei = await contract.totalBorrowed();
+    const availableLiquidityWei = await contract.availableLiquidity();
+    const apyBpsWei = await contract.ANNUAL_RATE_BPS();
 
     const depositMON = toMON(depositWei);
     const totalDepositedMON = toMON(totalDepositedWei);

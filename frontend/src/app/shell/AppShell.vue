@@ -40,7 +40,7 @@ const currentHeading = computed(() => {
 
   return (
     map[route.path] ?? {
-      title: 'KampusMON',
+      title: 'Monbank',
       subtitle: '',
     }
   );
@@ -48,7 +48,7 @@ const currentHeading = computed(() => {
 
 const disconnectWallet = async () => {
   await session.disconnectWallet();
-  await router.push('/uygulama');
+  await router.push('/');
 };
 </script>
 

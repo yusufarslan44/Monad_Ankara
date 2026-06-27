@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowUpRight, ShieldCheck, Sparkles, WalletCards } from 'lucide-vue-next';
+import { ArrowUpRight, PiggyBank, ShieldCheck, Sparkles, WalletCards } from 'lucide-vue-next';
 import type { ActivityItem } from '@/shared/types/domain';
 import { formatMON } from '@/shared/lib/formatters';
 
@@ -18,6 +18,7 @@ const iconMap = {
   borc: ArrowUpRight,
   kefalet: ShieldCheck,
   itibar: Sparkles,
+  havuz: PiggyBank,
 };
 
 const toneMap = {

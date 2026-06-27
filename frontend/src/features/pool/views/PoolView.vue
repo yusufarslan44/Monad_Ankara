@@ -158,22 +158,6 @@ const chooseLock = (days: number) => {
     </BaseCard>
 
     <template v-else-if="data">
-      <BaseCard
-        v-if="data.fallback"
-        class="rounded-[1.25rem] border border-amber-200 bg-amber-50/50"
-      >
-        <div class="flex items-start gap-3">
-          <AlertTriangle class="mt-0.5 h-5 w-5 text-amber-500" />
-          <div>
-            <p class="font-semibold text-ink-950">Demo verileri gosteriliyor</p>
-            <p class="mt-1 text-sm text-ink-700">
-              LendingPool kontrati yapilandirilmamis. Cuzdan bakiyen gercek, havuz metrikleri
-              ornek degerlerdir.
-            </p>
-          </div>
-        </div>
-      </BaseCard>
-
       <section class="grid gap-4">
         <BaseCard>
           <div class="flex items-start gap-3">

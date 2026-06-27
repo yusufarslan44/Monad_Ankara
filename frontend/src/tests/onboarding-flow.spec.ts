@@ -55,7 +55,6 @@ describe('onboarding integration', () => {
     // 3. Dogrulama kodunu gir ve gonder
     const codeInput = wrapper.find('input[placeholder="123456"]');
     expect(codeInput.exists()).toBe(true);
-
     await codeInput.setValue('123456');
     await vi.runAllTimersAsync();
     await flushPromises();

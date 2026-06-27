@@ -28,6 +28,12 @@ export const desktopNavigation: NavItem[] = [
     icon: CreditCard,
   },
   {
+    label: 'Havuz',
+    description: 'Likidite kilitle ve faiz kazan',
+    to: '/uygulama/havuz',
+    icon: PiggyBank,
+  },
+  {
     label: 'Itibar',
     description: 'Skor ve ritim',
     to: '/uygulama/itibar',
@@ -43,6 +49,12 @@ export const desktopNavigation: NavItem[] = [
 
 export const investorNavigation: NavItem[] = [
   {
+    label: 'Panel',
+    description: 'Yatirimci ozeti',
+    to: '/uygulama/panel',
+    icon: LayoutDashboard,
+  },
+  {
     label: 'Havuz',
     description: 'Likidite kilitle ve faiz kazan',
     to: '/uygulama/havuz',
@@ -54,6 +66,6 @@ export const mobileNavigation = desktopNavigation.slice(0, 4);
 
 export const mobileMoreNavigation = desktopNavigation.slice(4);
 
-const investorAllowedPaths = new Set(['/', '/uygulama', '/uygulama/havuz']);
+const investorAllowedPaths = new Set(['/', '/uygulama', '/uygulama/panel', '/uygulama/havuz']);
 
 export const isInvestorAllowedPath = (path: string) => investorAllowedPaths.has(path);
