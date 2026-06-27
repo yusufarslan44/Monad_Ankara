@@ -40,7 +40,7 @@ const currentHeading = computed(() => {
 
   return (
     map[route.path] ?? {
-      title: 'KampusMON',
+      title: 'Monbank',
       subtitle: '',
     }
   );

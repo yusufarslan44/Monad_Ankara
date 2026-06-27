@@ -49,8 +49,9 @@ const identityLabel = computed(() => {
   <header class="surface-card relative z-10 flex flex-col gap-4 p-4">
     <div class="flex items-start justify-between gap-3">
       <div>
-        <div class="label-chip mb-2">
-          KampusMON
+        <div class="flex items-center gap-2 mb-3">
+          <img src="/logo.png" alt="Monbank Logo" class="h-6 w-6 object-contain rounded-md" />
+          <span class="font-display text-sm font-bold text-ink-950 tracking-tight">Monbank</span>
         </div>
         <p class="text-sm font-medium text-ink-700">Merhaba, {{ firstName }}</p>
         <h1 class="mt-1 font-display text-[1.8rem] font-bold text-ink-950">{{ title }}</h1>
