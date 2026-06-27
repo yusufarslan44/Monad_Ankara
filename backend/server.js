@@ -8,6 +8,8 @@ const authRoutes = require("./routes/auth");
 const referralRoutes = require("./routes/referral");
 const dashboardRoutes = require("./routes/dashboard");
 const poolRoutes = require("./routes/pool");
+const creditScoreRoutes = require("./routes/creditScore");
+const creditScoreWorker = require("./services/creditScoreWorker");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -26,6 +28,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/referral", referralRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/pool", poolRoutes);
+app.use("/api/credit-score", creditScoreRoutes);
 
 // ─── Global hata yonetimi (en son) ──────────────────────────────────────────
 app.use(errorHandler);
@@ -37,6 +40,8 @@ if (require.main === module) {
     app.listen(PORT, () => {
       console.log(`Monad Kampus backend ${PORT} portunda calisiyor`);
     });
+    // Arka plan AI kredi-skoru tarayicisini baslat.
+    creditScoreWorker.start();
   });
 }
 

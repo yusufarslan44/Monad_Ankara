@@ -17,6 +17,7 @@
   "author": "Monad Kampus Backend",
   "license": "MIT",
   "dependencies": {
+    "@google/genai": "^1.52.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "ethers": "^6.13.2",

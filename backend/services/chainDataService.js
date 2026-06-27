@@ -1,6 +1,27 @@
 const { ethers } = require("ethers");
 const User = require("../models/User");
 const chainService = require("./chainService");
+const CreditScore = require("./../models/CreditScore");
+
+/**
+ * Adres icin AI kredi-skoru varsa dashboard reputation'ini onunla degistirir.
+ * Sekil (score/trend/streak/rehabEligible/summary) korunur; frontend degismez.
+ */
+async function applyAiReputation(address, fallbackReputation) {
+  try {
+    const ai = await CreditScore.findOne({ address });
+    if (!ai) return fallbackReputation;
+    return {
+      score: ai.score,
+      trend: ai.trend,
+      streak: fallbackReputation && fallbackReputation.streak != null ? fallbackReputation.streak : 0,
+      rehabEligible: fallbackReputation ? Boolean(fallbackReputation.rehabEligible) : false,
+      summary: ai.summary || (fallbackReputation && fallbackReputation.summary) || "",
+    };
+  } catch (_) {
+    return fallbackReputation;
+  }
+}
 
 const LENDING_POOL_ABI = [
   "function creditLimit(address user) view returns (uint256)",
@@ -294,8 +315,13 @@ async function getDashboardSnapshot(address) {
     };
   } catch (err) {
     console.warn("On-chain veri okunamadi, fallback snapshot kullaniliyor:", err.message);
-    return generateFallbackSnapshot(user);
+    const snapshot = generateFallbackSnapshot(user);
+    snapshot.reputation = await applyAiReputation(normalizedAddress, snapshot.reputation);
+    return snapshot;
   }
+
+  // AI kredi-skoru varsa reputation'i onunla degistir (yoksa deterministik kalir).
+  contractData.reputation = await applyAiReputation(normalizedAddress, contractData.reputation);
 
   return {
     studentProfile: {
