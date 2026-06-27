@@ -43,11 +43,36 @@ const quoteQuery = useQuery({
   enabled: computed(() => Number(values.amountMON) > 0),
 });
 
+const showGuaranteeLink = ref(false);
+
+const mapLoanError = (message: string): { text: string; guarantee: boolean } => {
+  if (message.includes('User rejected') || message.includes('4001')) {
+    return { text: 'MetaMask isteği reddedildi.', guarantee: false };
+  }
+  if (message.includes('insufficient funds')) {
+    return { text: 'Cuzdaninda islem ucreti (gas) icin yeterli MON yok.', guarantee: false };
+  }
+  if (message.includes('ExceedsCreditLimit')) {
+    return { text: 'Bu tutar kredi limitini asiyor. Daha dusuk tutar dene veya kefalet ekle.', guarantee: true };
+  }
+  if (message.includes('InsufficientLiquidity')) {
+    return { text: 'Havuzda yeterli likidite yok. Daha sonra tekrar dene.', guarantee: false };
+  }
+  if (message.includes('AlreadyHasLoan')) {
+    return { text: 'Zaten aktif bir borcun var. Once mevcut borcu kapat.', guarantee: false };
+  }
+  if (message.includes('NotStudent')) {
+    return { text: 'Once kampus kimligini dogrulamalisin.', guarantee: false };
+  }
+  return { text: message || 'Kredi istegi tamamlanamadi.', guarantee: false };
+};
+
 const mutation = useMutation({
   mutationFn: (payload: { amountMON: number; purpose: string }) =>
     dataAdapter.submitLoanRequest(payload.amountMON, payload.purpose),
   onSuccess: async () => {
     submitError.value = '';
+    showGuaranteeLink.value = false;
     successOpen.value = true;
     resetForm({
       values: {
@@ -62,7 +87,10 @@ const mutation = useMutation({
     ]);
   },
   onError: (error) => {
-    submitError.value = error instanceof Error ? error.message : 'Kredi istegi tamamlanamadi.';
+    const message = error instanceof Error ? error.message : '';
+    const mapped = mapLoanError(message);
+    submitError.value = mapped.text;
+    showGuaranteeLink.value = mapped.guarantee;
   },
 });
 
@@ -183,14 +211,14 @@ const purposeOptions = ['Kantin ve ulasim', 'Yemek', 'Kirtasiye', 'Acil ihtiyac'
 
           <div v-if="submitError" class="rounded-2xl bg-danger-100 px-4 py-3 text-sm font-medium text-danger-500">
             {{ submitError }}
-            <RouterLink to="/uygulama/kefalet" class="ml-2 underline">
+            <RouterLink v-if="showGuaranteeLink" to="/uygulama/kefalet" class="ml-2 underline">
               Kefalet ekranina git
             </RouterLink>
           </div>
 
           <BaseButton type="submit" :disabled="isSubmittingLoan" block>
-            Nano-krediyi ac
-            <ArrowRight class="h-4 w-4" />
+            {{ isSubmittingLoan ? 'MetaMask onay bekleniyor...' : 'Nano-krediyi ac' }}
+            <ArrowRight v-if="!isSubmittingLoan" class="h-4 w-4" />
           </BaseButton>
         </form>
       </BaseCard>
@@ -243,7 +271,7 @@ const purposeOptions = ['Kantin ve ulasim', 'Yemek', 'Kirtasiye', 'Acil ihtiyac'
     <BaseDialog
       :open="successOpen"
       title="Nano-kredi acildi"
-      description="Islem mock adapter uzerinden paneline islendi. Dashboard ve gecmis akisi guncellendi."
+      description="Islem zincire gonderildi. MON cuzdanina aktarildi; panel ve gecmis kisa surede guncellenecek."
       @close="successOpen = false"
     >
       <div class="flex flex-col gap-3">

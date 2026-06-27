@@ -2,7 +2,9 @@ import { dashboardApi } from '@/shared/adapters/dashboardApi';
 import { poolApi } from '@/shared/adapters/poolApi';
 import { walletAdapter } from '@/shared/adapters/walletAdapter';
 import {
+  encodeBorrow,
   encodeDeposit,
+  encodeRepay,
   encodeWithdraw,
   LENDING_POOL_ADDRESS,
   toHexWei,
@@ -54,8 +56,26 @@ export const dataAdapter = {
         return { txHash };
       },
   getLoanQuote: (amountMON: number) => mockCampusApi.getLoanQuote(amountMON),
-  submitLoanRequest: (amountMON: number, purpose: string) =>
-    mockCampusApi.submitLoanRequest(amountMON, purpose),
-  submitRepayment: (amountMON: number) => mockCampusApi.submitRepayment(amountMON),
+  submitLoanRequest: IS_TEST
+    ? (amountMON: number, purpose: string) => mockCampusApi.submitLoanRequest(amountMON, purpose)
+    : async (amountMON: number, _purpose: string) => {
+        // borrow(amount, referrer) — kontrat MON'u kullaniciya yollar, value gondermeyiz
+        const txHash = await walletAdapter.sendContractTx({
+          to: LENDING_POOL_ADDRESS,
+          data: encodeBorrow(amountMON),
+        });
+        return { txHash };
+      },
+  submitRepayment: IS_TEST
+    ? (amountMON: number) => mockCampusApi.submitRepayment(amountMON)
+    : async (amountMON: number) => {
+        // repay() payable — borc kadar value gonderilir, fazlasi kontratca iade edilir
+        const txHash = await walletAdapter.sendContractTx({
+          to: LENDING_POOL_ADDRESS,
+          data: encodeRepay(),
+          value: toHexWei(amountMON),
+        });
+        return { txHash };
+      },
   reset: () => mockCampusApi.reset(),
 };

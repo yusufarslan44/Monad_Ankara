@@ -19,8 +19,12 @@ export const encodeWithdraw = (amountMON: number): string => {
   return iface.encodeFunctionData('withdraw', [amountWei]);
 };
 
-export const encodeBorrow = (amountWei: bigint, referrer: string): string =>
-  iface.encodeFunctionData('borrow', [amountWei, referrer]);
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+export const encodeBorrow = (amountMON: number, referrer: string = ZERO_ADDRESS): string => {
+  const amountWei = parseEther(String(amountMON));
+  return iface.encodeFunctionData('borrow', [amountWei, referrer]);
+};
 
 export const encodeRepay = (): string =>
   iface.encodeFunctionData('repay', []);

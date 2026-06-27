@@ -32,9 +32,25 @@ const [amountMON, amountAttrs] = defineField('amountMON');
 
 const projectedAvailable = useRepaymentProjection(() => Number(values.amountMON) || 0);
 
+const submitError = ref('');
+
+const mapRepayError = (message: string): string => {
+  if (message.includes('User rejected') || message.includes('4001')) {
+    return 'MetaMask isteği reddedildi.';
+  }
+  if (message.includes('insufficient funds')) {
+    return 'Cuzdaninda yeterli MON yok.';
+  }
+  if (message.includes('NoActiveLoan')) {
+    return 'Aktif borcun bulunmuyor.';
+  }
+  return message || 'Odeme tamamlanamadi.';
+};
+
 const mutation = useMutation({
   mutationFn: (amount: number) => dataAdapter.submitRepayment(amount),
   onSuccess: async () => {
+    submitError.value = '';
     successOpen.value = true;
     resetForm({
       values: {
@@ -45,6 +61,9 @@ const mutation = useMutation({
       queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
       queryClient.invalidateQueries({ queryKey: ['history'] }),
     ]);
+  },
+  onError: (error) => {
+    submitError.value = mapRepayError(error instanceof Error ? error.message : '');
   },
 });
 
@@ -126,9 +145,13 @@ const quickAmounts = computed(() => {
             </div>
           </div>
 
+          <div v-if="submitError" class="rounded-2xl bg-danger-100 px-4 py-3 text-sm font-medium text-danger-500">
+            {{ submitError }}
+          </div>
+
           <BaseButton type="submit" :disabled="isSubmittingRepayment" block>
-            Parcali odemeyi isle
-            <ArrowRight class="h-4 w-4" />
+            {{ isSubmittingRepayment ? 'MetaMask onay bekleniyor...' : 'Odemeyi isle' }}
+            <ArrowRight v-if="!isSubmittingRepayment" class="h-4 w-4" />
           </BaseButton>
         </form>
       </BaseCard>
