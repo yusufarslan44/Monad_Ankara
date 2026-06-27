@@ -113,6 +113,11 @@ export interface WalletState {
   status: 'bagli-degil' | 'baglaniyor' | 'bagli';
   address?: string;
   network: string;
+  chainId?: string;
+  isInstalled?: boolean;
+  isSupportedNetwork?: boolean;
+  providerLabel?: string;
+  error?: string;
 }
 
 export interface SessionSnapshot {

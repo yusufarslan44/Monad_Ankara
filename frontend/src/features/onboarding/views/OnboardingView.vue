@@ -45,6 +45,30 @@ const currentStep = computed(() => {
   return 0;
 });
 
+const walletButtonLabel = computed(() => {
+  if (!wallet.value.isInstalled) {
+    return 'MetaMask kur';
+  }
+
+  if (wallet.value.status === 'baglaniyor') {
+    return 'MetaMask baglaniyor';
+  }
+
+  return 'MetaMask ile baglan';
+});
+
+const walletHint = computed(() => {
+  if (wallet.value.error) {
+    return wallet.value.error;
+  }
+
+  if (!wallet.value.isInstalled) {
+    return 'Devam etmek icin MetaMask kurulumu gerekli.';
+  }
+
+  return `${wallet.value.network} uzerinden devam edeceksin.`;
+});
+
 const steps = [
   {
     label: 'Kimlik',
@@ -60,6 +84,17 @@ const steps = [
 const onSubmit = handleSubmit(async (values) => {
   await session.submitCampusEmail(values.name, values.university, values.email);
 });
+
+const handleWalletAction = async () => {
+  if (!wallet.value.isInstalled) {
+    if (typeof window !== 'undefined') {
+      window.open('https://metamask.io/download/', '_blank', 'noopener,noreferrer');
+    }
+    return;
+  }
+
+  await session.connectWallet();
+};
 
 watch(
   isAppReady,
@@ -164,10 +199,12 @@ watch(
             <div class="space-y-1 rounded-2xl border border-ink-300/50 bg-white px-4 py-4">
               <p class="break-words font-semibold text-ink-950">{{ identity.email }}</p>
               <p class="text-sm text-ink-700">{{ session.studentProfile.university }}</p>
+              <p class="mt-3 text-sm text-ink-700">{{ walletHint }}</p>
+              <p v-if="wallet.address" class="mt-1 break-words text-sm text-ink-700">{{ wallet.address }}</p>
             </div>
 
-            <BaseButton :disabled="loading" block @click="session.connectWallet()">
-              Monad cuzdani bagla
+            <BaseButton :disabled="loading" block @click="handleWalletAction()">
+              {{ walletButtonLabel }}
               <ArrowRight class="h-4 w-4" />
             </BaseButton>
           </div>

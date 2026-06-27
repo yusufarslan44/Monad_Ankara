@@ -1,8 +1,20 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
+import { watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import AppShell from '@/app/shell/AppShell.vue';
+import { useSessionStore } from '@/stores/session';
 
 const route = useRoute();
+const router = useRouter();
+const session = useSessionStore();
+const { isAppReady } = storeToRefs(session);
+
+watch(isAppReady, async (ready) => {
+  if (!ready && route.meta.requiresReady) {
+    await router.replace('/uygulama');
+  }
+});
 </script>
 
 <template>

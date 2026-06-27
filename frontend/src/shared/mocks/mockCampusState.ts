@@ -48,6 +48,9 @@ const createInitialState = (): MockCampusState => ({
   wallet: {
     status: 'bagli-degil',
     network: 'Monad Testnet',
+    isInstalled: true,
+    isSupportedNetwork: true,
+    providerLabel: 'MetaMask',
   },
   creditLimit: {
     totalMON: 12.5,
@@ -214,6 +217,10 @@ export const mockCampusApi = {
       status: 'bagli',
       address: '0x9f4202C0B16bD96ce821bFCC0C4BbA9469522635',
       network: 'Monad Testnet',
+      chainId: '0x279f',
+      isInstalled: true,
+      isSupportedNetwork: true,
+      providerLabel: 'MetaMask',
     };
     return buildSessionSnapshot();
   },
@@ -222,6 +229,9 @@ export const mockCampusApi = {
     state.wallet = {
       status: 'bagli-degil',
       network: 'Monad Testnet',
+      isInstalled: true,
+      isSupportedNetwork: true,
+      providerLabel: 'MetaMask',
     };
     return buildSessionSnapshot();
   },

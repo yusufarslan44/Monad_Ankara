@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
+import { ArrowRight, Sparkles, WalletCards } from 'lucide-vue-next';
 import { dataAdapter } from '@/shared/adapters/dataAdapter';
 import { useDashboardQuery, useRepaymentProjection } from '@/shared/composables/useAppQueries';
 import { repaymentFormSchema } from '@/shared/lib/formSchemas';
@@ -60,91 +61,128 @@ const onSubmit = handleSubmit(async (formValues) => {
 });
 
 const isSubmittingRepayment = computed(() => mutation.isPending.value);
+const quickAmounts = computed(() => {
+  const outstanding = dashboard.value?.loanPosition.outstandingMON ?? 0;
+  const candidates = [0.5, 1, 2, Number(Math.min(outstanding, 3).toFixed(1))];
+
+  return [...new Set(candidates.map((value) => Number(value.toFixed(1))))]
+    .filter((value) => value >= 0.3 && value <= outstanding && value > 0)
+    .slice(0, 4);
+});
 </script>
 
 <template>
   <div v-if="dashboard" class="mx-auto max-w-5xl space-y-5">
-    <BaseCard>
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h2 class="font-display text-3xl font-bold text-ink-950">Parcali odeme</h2>
-          <p class="mt-2 text-sm text-ink-700">Kucuk odemelerle limitini toparla.</p>
-        </div>
-        <StatusBadge
-          :tone="dashboard.loanPosition.outstandingMON > 3 ? 'warning' : 'success'"
-          :label="dashboard.loanPosition.outstandingMON > 3 ? 'Odeme baskisi var' : 'Ritim dengede'"
-        />
-      </div>
-    </BaseCard>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <h2 class="font-display text-3xl font-bold text-ink-950">Parcali odeme</h2>
+      <StatusBadge
+        :tone="dashboard.loanPosition.outstandingMON > 3 ? 'warning' : 'success'"
+        :label="dashboard.loanPosition.outstandingMON > 3 ? 'Odeme baskisi var' : 'Ritim dengede'"
+      />
+    </div>
 
-    <section class="grid gap-4 md:grid-cols-3">
-      <div class="surface-muted p-4">
-        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">Acik borc</p>
-        <p class="mt-2 font-display text-2xl font-bold text-ink-950">{{ formatMON(dashboard.loanPosition.outstandingMON) }} MON</p>
-      </div>
-      <div class="surface-muted p-4">
-        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">Mevcut limit</p>
-        <p class="mt-2 font-display text-2xl font-bold text-ink-950">{{ formatMON(dashboard.creditLimit.availableMON) }} MON</p>
-      </div>
-      <div class="surface-muted p-4">
-        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">Acilacak alan</p>
-        <p class="mt-2 font-display text-2xl font-bold text-ink-950">{{ formatMON(dashboard.creditLimit.nextUnlockMON) }} MON</p>
-      </div>
-    </section>
-
-    <BaseCard>
-      <h3 class="font-display text-2xl font-bold text-ink-950">Odeme tutari</h3>
-      <form class="mt-6 space-y-5" @submit="onSubmit">
-        <BaseFormField
-          label="Bugun ne kadar odemek istiyorsun?"
-          :error="errors.amountMON"
-          required
-        >
-          <input
-            v-model="amountMON"
-            v-bind="amountAttrs"
-            type="number"
-            min="0.3"
-            step="0.1"
-            class="focus-ring min-h-11 w-full rounded-2xl border border-ink-300/50 bg-white px-4 py-3 text-ink-950"
-          />
-        </BaseFormField>
-
-        <BaseButton type="submit" :disabled="isSubmittingRepayment">
-          Parcali odemeyi isle
-        </BaseButton>
-      </form>
-    </BaseCard>
-
-    <section class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <section class="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_320px]">
       <BaseCard>
-        <h3 class="font-display text-2xl font-bold text-ink-950">Anlik etki</h3>
-        <div class="mt-5 grid gap-3 md:grid-cols-2">
-          <div class="surface-muted p-4">
-            <p class="text-sm text-ink-700">Tahmini yeni limit</p>
-            <p class="mt-2 font-display text-3xl font-bold text-ink-950">{{ formatMON(projectedAvailable) }} MON</p>
-          </div>
-          <div class="surface-muted p-4">
-            <p class="text-sm text-ink-700">Artan alan</p>
-            <p class="mt-2 font-display text-3xl font-bold text-ink-950">{{ formatMON(nextLift) }} MON</p>
-          </div>
-        </div>
-      </BaseCard>
-
-      <BaseCard>
-        <h3 class="font-display text-2xl font-bold text-ink-950">Siradaki odemeler</h3>
-        <ul class="mt-4 space-y-3">
-          <li v-for="installment in dashboard.repaymentSchedule" :key="installment.id" class="surface-muted p-4">
-            <div class="flex items-center justify-between gap-3">
-              <p class="font-semibold text-ink-950">{{ formatMON(installment.amountMON) }} MON</p>
-              <StatusBadge
-                :tone="installment.status === 'riskli' ? 'danger' : installment.status === 'tamamlandi' ? 'success' : 'neutral'"
-                :label="installment.dueLabel"
-              />
+        <form class="space-y-6" @submit="onSubmit">
+          <div class="space-y-3">
+            <p class="font-semibold text-ink-950">Bugun ne kadar odeyeceksin?</p>
+            <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+              <BaseFormField
+                label="Odeme tutari (MON)"
+                :error="errors.amountMON"
+                required
+              >
+                <input
+                  v-model="amountMON"
+                  v-bind="amountAttrs"
+                  type="number"
+                  min="0.3"
+                  step="0.1"
+                  class="focus-ring min-h-12 w-full rounded-2xl border border-ink-300/50 bg-white px-4 py-3 text-[1.1rem] font-semibold text-ink-950"
+                />
+              </BaseFormField>
+              <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+                <button
+                  v-for="value in quickAmounts"
+                  :key="value"
+                  type="button"
+                  class="focus-ring min-h-11 rounded-2xl border border-ink-300/50 bg-white px-3 py-2 text-sm font-semibold text-ink-900 transition-colors hover:bg-cream-50"
+                  @click="amountMON = value"
+                >
+                  {{ formatMON(value) }} MON
+                </button>
+              </div>
             </div>
-          </li>
-        </ul>
+          </div>
+
+          <div class="grid gap-3 md:grid-cols-2">
+            <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
+              <p class="text-sm text-ink-700">Tahmini yeni limit</p>
+              <p class="mt-2 font-display text-3xl font-bold text-ink-950">{{ formatMON(projectedAvailable) }} MON</p>
+            </div>
+            <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
+              <p class="text-sm text-ink-700">Toparlanacak alan</p>
+              <p class="mt-2 font-display text-3xl font-bold text-ink-950">{{ formatMON(nextLift) }} MON</p>
+            </div>
+          </div>
+
+          <BaseButton type="submit" :disabled="isSubmittingRepayment" block>
+            Parcali odemeyi isle
+            <ArrowRight class="h-4 w-4" />
+          </BaseButton>
+        </form>
       </BaseCard>
+
+      <div class="space-y-4">
+        <div class="rounded-[1.5rem] bg-ink-950 p-5 text-white">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">Canli etki</p>
+          <p class="mt-3 font-display text-4xl font-bold">{{ formatMON(nextLift) }} MON</p>
+          <p class="mt-2 text-sm text-white/80">Bu odemeyle toparlanacak limit</p>
+        </div>
+
+        <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
+          <div class="flex items-start gap-3">
+            <div class="grid h-10 w-10 place-items-center rounded-2xl bg-brand-100 text-brand-700">
+              <WalletCards class="h-4 w-4" />
+            </div>
+            <div>
+              <p class="font-semibold text-ink-950">Acik borc</p>
+              <p class="mt-1 text-sm text-ink-700">{{ formatMON(dashboard.loanPosition.outstandingMON) }} MON</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
+          <div class="flex items-start gap-3">
+            <div class="grid h-10 w-10 place-items-center rounded-2xl bg-success-100 text-success-500">
+              <Sparkles class="h-4 w-4" />
+            </div>
+            <div>
+              <p class="font-semibold text-ink-950">Mevcut limit</p>
+              <p class="mt-1 text-sm text-ink-700">{{ formatMON(dashboard.creditLimit.availableMON) }} MON</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
+          <p class="font-semibold text-ink-950">Siradaki odemeler</p>
+          <ul class="mt-4 space-y-3">
+            <li
+              v-for="installment in dashboard.repaymentSchedule"
+              :key="installment.id"
+              class="rounded-[1rem] border border-ink-300/50 bg-cream-50 px-3 py-3"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <p class="font-semibold text-ink-950">{{ formatMON(installment.amountMON) }} MON</p>
+                <StatusBadge
+                  :tone="installment.status === 'riskli' ? 'danger' : installment.status === 'tamamlandi' ? 'success' : 'neutral'"
+                  :label="installment.dueLabel"
+                />
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <BaseDialog

@@ -15,6 +15,17 @@ const session = useSessionStore();
 const { identity, studentProfile, wallet } = storeToRefs(session);
 
 const firstName = computed(() => studentProfile.value.name.split(' ')[0] || 'Kullanici');
+const walletLabel = computed(() => {
+  if (!wallet.value.isInstalled) {
+    return 'MetaMask yok';
+  }
+
+  if (wallet.value.status !== 'bagli') {
+    return wallet.value.error || 'Bagli degil';
+  }
+
+  return formatShortAddress(wallet.value.address);
+});
 </script>
 
 <template>
@@ -35,7 +46,7 @@ const firstName = computed(() => studentProfile.value.name.split(' ')[0] || 'Kul
         />
         <div class="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink-300/50 bg-surface-0 px-4 py-2 text-sm font-semibold text-ink-900">
             <Wallet class="h-4 w-4 text-brand-700" />
-            {{ formatShortAddress(wallet.address) }}
+            {{ walletLabel }}
         </div>
       </div>
     </div>

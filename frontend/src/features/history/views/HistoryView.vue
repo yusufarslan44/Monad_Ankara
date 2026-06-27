@@ -8,10 +8,7 @@ const { data } = useHistoryQuery();
 
 <template>
   <div v-if="data" class="mx-auto max-w-4xl space-y-5">
-    <BaseCard>
-      <h2 class="font-display text-3xl font-bold text-ink-950">Tum hareketler</h2>
-      <p class="mt-2 text-sm text-ink-700">Islemler sirali sekilde listelenir.</p>
-    </BaseCard>
+    <h2 class="font-display text-3xl font-bold text-ink-950">Tum hareketler</h2>
 
     <BaseCard>
       <TimelineList :items="data.items" />

@@ -30,7 +30,7 @@ describe('onboarding integration', () => {
     await vi.runAllTimersAsync();
     await flushPromises();
 
-    const walletButton = wrapper.findAll('button').find((button) => button.text().includes('Monad cuzdani bagla'));
+    const walletButton = wrapper.findAll('button').find((button) => button.text().includes('MetaMask ile baglan'));
     expect(walletButton).toBeTruthy();
 
     await walletButton!.trigger('click');

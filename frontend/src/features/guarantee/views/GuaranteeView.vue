@@ -36,18 +36,16 @@ const isApproving = computed(() => mutation.isPending.value);
 
 <template>
   <div v-if="data" class="mx-auto max-w-5xl space-y-5">
-    <BaseCard>
+    <div>
       <h2 class="font-display text-3xl font-bold text-ink-950">Aktif kefalet tamponlari</h2>
-      <div class="mt-6 grid gap-4 md:grid-cols-2">
+      <div class="mt-5 grid gap-4 md:grid-cols-2">
         <article
           v-for="exposure in data.exposures"
           :key="exposure.id"
-          class="surface-muted p-5"
+          class="rounded-[1.25rem] border border-ink-300/50 bg-white p-5"
         >
           <div class="flex items-start justify-between gap-3">
-            <div>
-              <p class="font-semibold text-ink-950">{{ exposure.friendName }}</p>
-            </div>
+            <p class="font-semibold text-ink-950">{{ exposure.friendName }}</p>
             <StatusBadge
               :tone="exposure.risk === 'Yuksek' ? 'danger' : exposure.risk === 'Orta' ? 'warning' : 'success'"
               :label="getExposureRiskCopy(exposure)"
@@ -59,7 +57,7 @@ const isApproving = computed(() => mutation.isPending.value);
           <p class="mt-2 text-sm text-ink-700">{{ exposure.status }}</p>
         </article>
       </div>
-    </BaseCard>
+    </div>
 
     <BaseCard>
       <h2 class="font-display text-2xl font-bold text-ink-950">Gelen talepler</h2>
@@ -67,7 +65,7 @@ const isApproving = computed(() => mutation.isPending.value);
         <article
           v-for="request in data.requests"
           :key="request.id"
-          class="surface-muted p-4"
+          class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4"
         >
           <div class="flex items-start justify-between gap-3">
             <div>

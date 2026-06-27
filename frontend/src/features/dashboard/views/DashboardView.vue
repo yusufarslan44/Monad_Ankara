@@ -31,86 +31,64 @@ const activeGuaranteeCount = computed(
 
 <template>
   <div v-if="data" class="space-y-5">
-    <section class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
-      <BaseCard>
-        <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
-          <div>
-            <p class="text-sm font-medium text-ink-700">Hos geldin, {{ firstName }}</p>
-            <h2 class="mt-2 font-display text-3xl font-bold text-ink-950 sm:text-[2.3rem]">
-              {{ data.nextAction === 'borc-al' ? 'Hazir limitin var.' : 'Odeme zamani.' }}
-            </h2>
-            <p class="mt-2 text-sm text-ink-700">
-              {{ data.nextAction === 'borc-al' ? 'Istersen hemen islem acabilirsin.' : 'Kucuk bir odeme ile limitini toparlayabilirsin.' }}
-            </p>
-
-            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
-              <RouterLink :to="actionHref">
-                <BaseButton>
-                  {{ actionLabel }}
-                  <ArrowRight class="h-4 w-4" />
-                </BaseButton>
-              </RouterLink>
-              <RouterLink to="/uygulama/gecmis">
-                <BaseButton variant="ghost">Son hareketler</BaseButton>
-              </RouterLink>
-            </div>
-
-            <div class="mt-6 grid gap-3 sm:grid-cols-3">
-              <div class="rounded-3xl border border-ink-300/35 bg-surface-0/90 px-4 py-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">Limit</p>
-                <p class="mt-2 font-display text-2xl font-bold text-ink-950">{{ formatMON(data.creditLimit.availableMON) }} MON</p>
-              </div>
-              <div class="rounded-3xl border border-ink-300/35 bg-surface-0/90 px-4 py-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">Borc</p>
-                <p class="mt-2 font-display text-2xl font-bold text-ink-950">{{ formatMON(data.loanPosition.outstandingMON) }} MON</p>
-              </div>
-              <div class="rounded-3xl border border-ink-300/35 bg-surface-0/90 px-4 py-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">Itibar</p>
-                <p class="mt-2 font-display text-2xl font-bold text-ink-950">{{ data.reputation.score }}/100</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="rounded-[1.25rem] bg-brand-600 p-4 text-white sm:p-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">Yakindaki acilis</p>
-            <p class="mt-2 font-display text-3xl font-bold">{{ formatMON(data.creditLimit.nextUnlockMON) }} MON</p>
-          </div>
+    <BaseCard>
+      <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p class="text-sm font-medium text-ink-700">Hos geldin, {{ firstName }}</p>
+          <h2 class="mt-2 font-display text-3xl font-bold text-ink-950 sm:text-[2.3rem]">
+            {{ data.nextAction === 'borc-al' ? 'Hazir limitin var.' : 'Odeme zamani.' }}
+          </h2>
         </div>
-      </BaseCard>
 
-      <CreditGauge
-        :value="usageRatio"
-        label="Limit dengesi"
-        detail="Daha yuksek oran, daha fazla baski demek."
-      />
-    </section>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <RouterLink :to="actionHref">
+            <BaseButton>
+              {{ actionLabel }}
+              <ArrowRight class="h-4 w-4" />
+            </BaseButton>
+          </RouterLink>
+          <RouterLink to="/uygulama/gecmis">
+            <BaseButton variant="ghost">Son hareketler</BaseButton>
+          </RouterLink>
+        </div>
+      </div>
+    </BaseCard>
 
-    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <StatCard
         eyebrow="Kullanilabilir limit"
         :value="`${formatMON(data.creditLimit.availableMON)} MON`"
-        detail="Su an kullanilabilir."
+        detail="Su an kullanilabilir"
         :trend="data.creditLimit.scoreBand"
       />
       <StatCard
         eyebrow="Acik borc"
         :value="`${formatMON(data.loanPosition.outstandingMON)} MON`"
-        detail="Kademeli odeme yapabilirsin."
+        detail="Kademeli odeme acik"
       />
       <StatCard
         eyebrow="Itibar puani"
         :value="`${data.reputation.score}/100`"
-        detail="Odeme ritmine gore guncellenir."
+        detail="Odeme ritmiyle guncellenir"
         :trend="data.reputation.trend"
+      />
+      <StatCard
+        eyebrow="Sonraki acilis"
+        :value="`${formatMON(data.creditLimit.nextUnlockMON)} MON`"
+        detail="Bir sonraki alan"
       />
     </section>
 
-    <section class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <section class="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <CreditGauge
+        :value="usageRatio"
+        label="Limit dengesi"
+        detail="Yukselirse baski artar."
+      />
+
       <BaseCard>
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 class="font-display text-2xl font-bold text-ink-950">Son hareketler</h2>
-          </div>
+          <h2 class="font-display text-2xl font-bold text-ink-950">Son hareketler</h2>
           <RouterLink to="/uygulama/gecmis">
             <BaseButton variant="ghost">Tum gecmis</BaseButton>
           </RouterLink>
@@ -119,48 +97,53 @@ const activeGuaranteeCount = computed(
           <TimelineList :items="data.activity.slice(0, 2)" :show-description="false" />
         </div>
       </BaseCard>
+    </section>
 
-      <BaseCard>
-        <h2 class="font-display text-2xl font-bold text-ink-950">Kisa bilgi</h2>
-        <div class="mt-5 space-y-2.5">
-          <div class="surface-muted flex items-start gap-3 p-4">
-            <div class="grid h-10 w-10 place-items-center rounded-2xl bg-brand-100 text-brand-700">
-              <WalletCards class="h-4 w-4" />
-            </div>
-            <div>
-              <p class="font-semibold text-ink-950">Kimlik aktif</p>
-              <p class="mt-1 text-sm text-ink-700">{{ data.studentProfile.university }}</p>
-            </div>
+    <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
+        <div class="flex items-start gap-3">
+          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-brand-100 text-brand-700">
+            <WalletCards class="h-4 w-4" />
           </div>
-          <div class="surface-muted flex items-start gap-3 p-4">
-            <div class="grid h-10 w-10 place-items-center rounded-2xl bg-amber-100 text-amber-500">
-              <HandCoins class="h-4 w-4" />
-            </div>
-            <div>
-              <p class="font-semibold text-ink-950">Acilabilir alan</p>
-              <p class="mt-1 text-sm text-ink-700">{{ formatMON(data.creditLimit.nextUnlockMON) }} MON</p>
-            </div>
-          </div>
-          <div class="surface-muted flex items-start gap-3 p-4">
-            <div class="grid h-10 w-10 place-items-center rounded-2xl bg-coral-100 text-coral-500">
-              <ShieldCheck class="h-4 w-4" />
-            </div>
-            <div>
-              <p class="font-semibold text-ink-950">Aktif kefalet</p>
-              <p class="mt-1 text-sm text-ink-700">{{ activeGuaranteeCount }} adet</p>
-            </div>
-          </div>
-          <div class="surface-muted flex items-start gap-3 p-4">
-            <div class="grid h-10 w-10 place-items-center rounded-2xl bg-success-100 text-success-500">
-              <Sparkles class="h-4 w-4" />
-            </div>
-            <div>
-              <p class="font-semibold text-ink-950">Itibar</p>
-              <p class="mt-1 text-sm text-ink-700">{{ data.reputation.trend }}</p>
-            </div>
+          <div>
+            <p class="font-semibold text-ink-950">Kimlik aktif</p>
+            <p class="mt-1 text-sm text-ink-700">{{ data.studentProfile.university }}</p>
           </div>
         </div>
-      </BaseCard>
+      </div>
+      <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
+        <div class="flex items-start gap-3">
+          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-amber-100 text-amber-500">
+            <HandCoins class="h-4 w-4" />
+          </div>
+          <div>
+            <p class="font-semibold text-ink-950">Acilabilir alan</p>
+            <p class="mt-1 text-sm text-ink-700">{{ formatMON(data.creditLimit.nextUnlockMON) }} MON</p>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
+        <div class="flex items-start gap-3">
+          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-coral-100 text-coral-500">
+            <ShieldCheck class="h-4 w-4" />
+          </div>
+          <div>
+            <p class="font-semibold text-ink-950">Aktif kefalet</p>
+            <p class="mt-1 text-sm text-ink-700">{{ activeGuaranteeCount }} adet</p>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
+        <div class="flex items-start gap-3">
+          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-success-100 text-success-500">
+            <Sparkles class="h-4 w-4" />
+          </div>
+          <div>
+            <p class="font-semibold text-ink-950">Itibar</p>
+            <p class="mt-1 text-sm text-ink-700">{{ data.reputation.trend }}</p>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
 </template>

@@ -23,6 +23,9 @@ describe('repayment flow', () => {
         status: 'bagli',
         address: '0x9f4202C0B16bD96ce821bFCC0C4BbA9469522635',
         network: 'Monad Testnet',
+        isInstalled: true,
+        isSupportedNetwork: true,
+        providerLabel: 'MetaMask',
       },
       bootstrapped: true,
     });
@@ -36,7 +39,10 @@ describe('repayment flow', () => {
 
     await vi.runAllTimersAsync();
     await flushPromises();
-    await wrapper.find('input[type="number"]').setValue('2');
+    const amountButton = wrapper.findAll('button').find((button) => button.text().includes('2 MON'));
+    expect(amountButton).toBeTruthy();
+    await amountButton!.trigger('click');
+    await vi.runAllTimersAsync();
     await flushPromises();
 
     expect(wrapper.text()).toContain('7,20 MON');
