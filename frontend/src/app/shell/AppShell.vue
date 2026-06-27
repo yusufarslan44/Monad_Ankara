@@ -27,9 +27,9 @@ const headingMap: Record<string, { title: string; subtitle: string }> = {
     title: 'Odeme',
     subtitle: '',
   },
-  '/uygulama/kefalet': {
-    title: 'Kefalet',
-    subtitle: '',
+  '/uygulama/havuz': {
+    title: 'Havuz',
+    subtitle: 'Likidite kilitle ve faiz kazan',
   },
   '/uygulama/itibar': {
     title: 'Itibar',

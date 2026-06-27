@@ -10,10 +10,10 @@ export const useDashboardQuery = () =>
     queryFn: () => dataAdapter.getDashboardSnapshot(),
   });
 
-export const useGuaranteeQuery = () =>
+export const usePoolQuery = () =>
   useQuery({
-    queryKey: ['guarantees'],
-    queryFn: () => dataAdapter.getGuaranteeSnapshot(),
+    queryKey: ['pool'],
+    queryFn: () => dataAdapter.getPoolSnapshot(),
   });
 
 export const useHistoryQuery = () =>

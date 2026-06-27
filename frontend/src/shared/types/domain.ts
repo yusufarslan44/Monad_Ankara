@@ -39,13 +39,24 @@ export interface RepaymentInstallment {
   note: string;
 }
 
-export interface GuarantorExposure {
+export interface PoolDeposit {
   id: string;
-  friendName: string;
   amountMON: number;
-  risk: 'Dusuk' | 'Orta' | 'Yuksek';
-  status: 'Aktif' | 'Bekliyor' | 'Tamamlandi';
-  note: string;
+  lockDays: number;
+  apyBps: number;
+  depositedAt: string;
+  maturesAt: string;
+  status: 'Aktif' | 'Cozulebilir' | 'Cozuldu';
+  projectedInterestMON: number;
+}
+
+export interface PoolSnapshot {
+  totalDepositedMON: number;
+  totalBorrowedMON: number;
+  availableLiquidityMON: number;
+  userDeposits: PoolDeposit[];
+  globalApyBps: number;
+  projectedInterestMON: number;
 }
 
 export interface ReputationSnapshot {
@@ -58,7 +69,7 @@ export interface ReputationSnapshot {
 
 export interface ActivityItem {
   id: string;
-  type: 'odeme' | 'borc' | 'kefalet' | 'itibar';
+  type: 'odeme' | 'borc' | 'kefalet' | 'havuz' | 'itibar';
   title: string;
   description: string;
   at: string;
@@ -71,7 +82,7 @@ export interface DashboardSnapshot {
   campusIdentity: CampusIdentityStatus;
   creditLimit: CreditLimit;
   loanPosition: LoanPosition;
-  guarantorExposure: GuarantorExposure[];
+  poolPosition: PoolSnapshot;
   reputation: ReputationSnapshot;
   repaymentSchedule: RepaymentInstallment[];
   activity: ActivityItem[];
@@ -91,18 +102,16 @@ export interface LoanQuote {
   requiresGuarantee: boolean;
 }
 
-export interface GuaranteeRequest {
-  id: string;
-  friendName: string;
+export interface PoolDepositInput {
   amountMON: number;
-  message: string;
-  requestedAt: string;
-  status: 'Bekliyor' | 'Onaylandi';
+  lockDays: number;
 }
 
-export interface GuaranteeSnapshot {
-  exposures: GuarantorExposure[];
-  requests: GuaranteeRequest[];
+export interface PoolQuote {
+  amountMON: number;
+  lockDays: number;
+  apyBps: number;
+  projectedInterestMON: number;
 }
 
 export interface HistorySnapshot {

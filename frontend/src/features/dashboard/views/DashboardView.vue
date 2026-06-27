@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
-import { ArrowRight, HandCoins, ShieldCheck, Sparkles, WalletCards } from 'lucide-vue-next';
+import { ArrowRight, HandCoins, PiggyBank, Sparkles, WalletCards } from 'lucide-vue-next';
 import { useDashboardQuery } from '@/shared/composables/useAppQueries';
 import { calculateUsageRatio } from '@/shared/lib/calculations';
 import { formatMON } from '@/shared/lib/formatters';
@@ -24,8 +24,8 @@ const usageRatio = computed(() => {
 const firstName = computed(() => data.value?.studentProfile.name.split(' ')[0] ?? 'Kullanici');
 const actionHref = computed(() => (data.value?.nextAction === 'borc-al' ? '/uygulama/borc-al' : '/uygulama/odeme'));
 const actionLabel = computed(() => (data.value?.nextAction === 'borc-al' ? 'Borc al' : 'Odeme yap'));
-const activeGuaranteeCount = computed(
-  () => data.value?.guarantorExposure.filter((item) => item.status === 'Aktif').length ?? 0,
+const userPoolTotal = computed(() =>
+  data.value?.poolPosition.userDeposits.reduce((sum, deposit) => sum + deposit.amountMON, 0) ?? 0,
 );
 </script>
 
@@ -125,11 +125,11 @@ const activeGuaranteeCount = computed(
       <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
         <div class="flex items-start gap-3">
           <div class="grid h-10 w-10 place-items-center rounded-2xl bg-coral-100 text-coral-500">
-            <ShieldCheck class="h-4 w-4" />
+            <PiggyBank class="h-4 w-4" />
           </div>
           <div>
-            <p class="font-semibold text-ink-950">Aktif kefalet</p>
-            <p class="mt-1 text-sm text-ink-700">{{ activeGuaranteeCount }} adet</p>
+            <p class="font-semibold text-ink-950">Havuz yatirimim</p>
+            <p class="mt-1 text-sm text-ink-700">{{ formatMON(userPoolTotal) }} MON</p>
           </div>
         </div>
       </div>

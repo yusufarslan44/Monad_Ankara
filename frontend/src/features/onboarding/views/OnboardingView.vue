@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useForm } from 'vee-validate';
@@ -14,6 +14,12 @@ import StatusBadge from '@/shared/components/StatusBadge.vue';
 const router = useRouter();
 const session = useSessionStore();
 const { identity, wallet, loading, isAppReady } = storeToRefs(session);
+
+const submissionError = ref('');
+
+const clearSubmissionError = () => {
+  submissionError.value = '';
+};
 
 const identitySchema = toTypedSchema(onboardingFormSchema);
 const codeSchema = toTypedSchema(verificationCodeSchema);
@@ -98,15 +104,29 @@ const steps = [
 ];
 
 const onIdentitySubmit = handleIdentitySubmit(async (values) => {
-  await session.startVerification(values.name, values.university, values.email, values.referralCode || undefined);
-  resetCodeForm();
+  clearSubmissionError();
+
+  try {
+    await session.startVerification(values.name, values.university, values.email, values.referralCode || undefined);
+    resetCodeForm();
+  } catch (error) {
+    submissionError.value = error instanceof Error ? error.message : 'Kod gonderilemedi. Lutfen tekrar dene.';
+  }
 });
 
 const onCodeSubmit = handleCodeSubmit(async (values) => {
-  await session.verifyCode(values.code);
+  clearSubmissionError();
+
+  try {
+    await session.verifyCode(values.code);
+  } catch (error) {
+    submissionError.value = error instanceof Error ? error.message : 'Kod dogrulanamadi. Lutfen tekrar dene.';
+  }
 });
 
 const handleWalletAction = async () => {
+  clearSubmissionError();
+
   if (!wallet.value.isInstalled) {
     if (typeof window !== 'undefined') {
       window.open('https://metamask.io/download/', '_blank', 'noopener,noreferrer');
@@ -114,7 +134,11 @@ const handleWalletAction = async () => {
     return;
   }
 
-  await session.connectWallet();
+  try {
+    await session.connectWallet();
+  } catch (error) {
+    submissionError.value = error instanceof Error ? error.message : 'Cuzdan baglanamadi.';
+  }
 };
 
 watch(
@@ -152,6 +176,7 @@ watch(
                 </div>
               </div>
               <StatusBadge tone="warning" label="Cuzdan bekleniyor" />
+              <StatusBadge v-if="submissionError" tone="danger" :label="submissionError" class="mt-2" />
             </div>
 
             <div class="space-y-1 rounded-2xl border border-ink-300/50 bg-white px-4 py-4">
@@ -177,6 +202,7 @@ watch(
                 </div>
               </div>
               <StatusBadge tone="warning" label="E-posta bekleniyor" />
+              <StatusBadge v-if="submissionError" tone="danger" :label="submissionError" class="mt-2" />
             </div>
 
             <div class="grid gap-4 sm:grid-cols-2">
@@ -255,12 +281,16 @@ watch(
                 </div>
               </div>
               <StatusBadge tone="warning" label="Kod bekleniyor" />
+              <StatusBadge v-if="submissionError" tone="danger" :label="submissionError" class="mt-2" />
             </div>
 
             <div class="rounded-2xl border border-ink-300/50 bg-white px-4 py-4">
               <p class="text-sm text-ink-700">
                 <span class="font-semibold text-ink-950">{{ identity.email }}</span> adresine 6 haneli kod gonderildi.
                 Spam kutusunu da kontrol etmeyi unutma.
+              </p>
+              <p class="mt-2 text-xs text-ink-500">
+                Not: E-posta servisi yapilandirilmamissa kod, backend calistigi terminal ekranina yazilir.
               </p>
             </div>
 

@@ -5,7 +5,7 @@ import OnboardingView from '@/features/onboarding/views/OnboardingView.vue';
 import DashboardView from '@/features/dashboard/views/DashboardView.vue';
 import LoanView from '@/features/loan/views/LoanView.vue';
 import RepaymentView from '@/features/repayment/views/RepaymentView.vue';
-import GuaranteeView from '@/features/guarantee/views/GuaranteeView.vue';
+import PoolView from '@/features/pool/views/PoolView.vue';
 import ReputationView from '@/features/reputation/views/ReputationView.vue';
 import HistoryView from '@/features/history/views/HistoryView.vue';
 import AppLayoutView from '@/app/shell/AppLayoutView.vue';
@@ -63,9 +63,9 @@ const router = createRouter({
           },
         },
         {
-          path: 'kefalet',
-          name: 'guarantee',
-          component: GuaranteeView,
+          path: 'havuz',
+          name: 'pool',
+          component: PoolView,
           meta: {
             layout: 'app',
             requiresReady: true,

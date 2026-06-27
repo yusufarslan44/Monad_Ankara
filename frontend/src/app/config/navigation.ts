@@ -1,5 +1,5 @@
 import type { RouteLocationRaw } from 'vue-router';
-import { BadgeDollarSign, CreditCard, HandCoins, LayoutDashboard, ShieldCheck, Sparkles } from 'lucide-vue-next';
+import { BadgeDollarSign, CreditCard, HandCoins, LayoutDashboard, PiggyBank, Sparkles } from 'lucide-vue-next';
 
 export interface NavItem {
   label: string;
@@ -28,10 +28,10 @@ export const desktopNavigation: NavItem[] = [
     icon: CreditCard,
   },
   {
-    label: 'Kefalet',
-    description: 'Sosyal tampon',
-    to: '/uygulama/kefalet',
-    icon: ShieldCheck,
+    label: 'Havuz',
+    description: 'Likidite kilitle ve faiz kazan',
+    to: '/uygulama/havuz',
+    icon: PiggyBank,
   },
   {
     label: 'Itibar',

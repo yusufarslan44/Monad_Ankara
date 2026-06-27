@@ -1,4 +1,4 @@
-import type { CreditLimit, GuarantorExposure, LoanPosition, ReputationSnapshot } from '@/shared/types/domain';
+import type { CreditLimit, LoanPosition, ReputationSnapshot } from '@/shared/types/domain';
 
 export const calculateUsageRatio = (creditLimit: CreditLimit, loanPosition: LoanPosition) => {
   if (creditLimit.totalMON === 0) {
@@ -34,16 +34,8 @@ export const calculateRepaymentLift = (
 export const getPrimaryAction = (loanPosition: LoanPosition) =>
   loanPosition.outstandingMON > 1 ? 'odeme-yap' : 'borc-al';
 
-export const getExposureRiskCopy = (exposure: GuarantorExposure) => {
-  if (exposure.risk === 'Yuksek') {
-    return 'Kritik';
-  }
-
-  if (exposure.risk === 'Orta') {
-    return 'Izlenmeli';
-  }
-
-  return 'Dengeli';
+export const calculatePoolInterest = (amountMON: number, lockDays: number, apyBps: number): number => {
+  return Number(((amountMON * apyBps * lockDays) / (10_000 * 365)).toFixed(4));
 };
 
 export const getReputationDelta = (reputation: ReputationSnapshot) => {

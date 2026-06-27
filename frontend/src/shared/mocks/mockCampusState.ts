@@ -3,12 +3,13 @@ import type {
   CampusIdentityStatus,
   CreditLimit,
   DashboardSnapshot,
-  GuaranteeRequest,
-  GuaranteeSnapshot,
-  GuarantorExposure,
   HistorySnapshot,
   LoanPosition,
   LoanQuote,
+  PoolDeposit,
+  PoolDepositInput,
+  PoolQuote,
+  PoolSnapshot,
   RepaymentInstallment,
   ReputationSnapshot,
   SessionSnapshot,
@@ -25,10 +26,15 @@ interface MockCampusState {
   loanPosition: LoanPosition;
   reputation: ReputationSnapshot;
   repaymentSchedule: RepaymentInstallment[];
-  exposures: GuarantorExposure[];
-  requests: GuaranteeRequest[];
   activity: ActivityItem[];
+  poolPosition: PoolSnapshot;
 }
+
+const GLOBAL_APY_BPS = 500;
+
+const calculatePoolInterest = (amountMON: number, lockDays: number, apyBps: number): number => {
+  return Number(((amountMON * apyBps * lockDays) / (10_000 * 365)).toFixed(4));
+};
 
 const createInitialState = (): MockCampusState => ({
   studentProfile: {
@@ -55,7 +61,7 @@ const createInitialState = (): MockCampusState => ({
   creditLimit: {
     totalMON: 12.5,
     availableMON: 5.8,
-    guaranteedMON: 2.2,
+    guaranteedMON: 0,
     scoreBand: 'Baslangic+',
     nextUnlockMON: 2.4,
   },
@@ -96,34 +102,6 @@ const createInitialState = (): MockCampusState => ({
       note: 'Ufak bir gecikme sinyali. Itibar puani etkilenmeden kapatilabilir.',
     },
   ],
-  exposures: [
-    {
-      id: 'gx-1',
-      friendName: 'Ece Demir',
-      amountMON: 1.4,
-      risk: 'Dusuk',
-      status: 'Aktif',
-      note: '2 parcali odeme ritminde.',
-    },
-    {
-      id: 'gx-2',
-      friendName: 'Mert Ayaz',
-      amountMON: 2.1,
-      risk: 'Orta',
-      status: 'Bekliyor',
-      note: 'Limit asimi icin ek teyit bekleniyor.',
-    },
-  ],
-  requests: [
-    {
-      id: 'gr-1',
-      friendName: 'Selin Arin',
-      amountMON: 1.8,
-      message: 'Kantin ve ulasim gideri icin 72 saatlik destek istiyor.',
-      requestedAt: '10 dk once',
-      status: 'Bekliyor',
-    },
-  ],
   activity: [
     {
       id: 'act-1',
@@ -136,11 +114,11 @@ const createInitialState = (): MockCampusState => ({
     },
     {
       id: 'act-2',
-      type: 'kefalet',
-      title: 'Yeni kefalet talebi alindi',
-      description: 'Selin Arin senden 1.8 MON kefalet tamponu istedi.',
+      type: 'havuz',
+      title: 'Havuz yatirimi yapildi',
+      description: '2.0 MON, 30 gunlugune kilitlendi; tahmini faiz 0.08 MON.',
       at: 'Bugun 09:05',
-      amountMON: 1.8,
+      amountMON: 2,
       tone: 'neutral',
     },
     {
@@ -152,6 +130,35 @@ const createInitialState = (): MockCampusState => ({
       tone: 'positive',
     },
   ],
+  poolPosition: {
+    totalDepositedMON: 24.5,
+    totalBorrowedMON: 8.2,
+    availableLiquidityMON: 16.3,
+    globalApyBps: GLOBAL_APY_BPS,
+    projectedInterestMON: 0.21,
+    userDeposits: [
+      {
+        id: 'pd-1',
+        amountMON: 2,
+        lockDays: 30,
+        apyBps: GLOBAL_APY_BPS,
+        depositedAt: 'Bugun 09:05',
+        maturesAt: '30 gun sonra',
+        status: 'Aktif',
+        projectedInterestMON: calculatePoolInterest(2, 30, GLOBAL_APY_BPS),
+      },
+      {
+        id: 'pd-2',
+        amountMON: 1.5,
+        lockDays: 7,
+        apyBps: GLOBAL_APY_BPS,
+        depositedAt: 'Dun',
+        maturesAt: '5 gun sonra',
+        status: 'Cozulebilir',
+        projectedInterestMON: calculatePoolInterest(1.5, 7, GLOBAL_APY_BPS),
+      },
+    ],
+  },
 });
 
 const state = createInitialState();
@@ -170,7 +177,7 @@ const buildDashboardSnapshot = (): DashboardSnapshot => ({
   campusIdentity: clone(state.identity),
   creditLimit: clone(state.creditLimit),
   loanPosition: clone(state.loanPosition),
-  guarantorExposure: clone(state.exposures),
+  poolPosition: clone(state.poolPosition),
   reputation: clone(state.reputation),
   repaymentSchedule: clone(state.repaymentSchedule),
   activity: clone(state.activity),
@@ -180,35 +187,6 @@ const buildDashboardSnapshot = (): DashboardSnapshot => ({
 export const mockCampusApi = {
   async getSessionSnapshot() {
     await delay();
-    return buildSessionSnapshot();
-  },
-  async submitCampusEmail(name: string, university: string, email: string) {
-    await delay(350);
-
-    if (!email.endsWith('.edu.tr')) {
-      throw new Error('Lutfen gecerli bir universite e-postasi gir.');
-    }
-
-    state.studentProfile.name = name;
-    state.studentProfile.university = university;
-    state.studentProfile.email = email;
-    state.identity = {
-      status: 'dogrulandi',
-      emailEligible: true,
-      email,
-      verifiedAt: 'Az once',
-      soulboundReady: true,
-    };
-
-    state.activity.unshift({
-      id: `act-${Date.now()}`,
-      type: 'itibar',
-      title: 'Kampus kimligi olusturuldu',
-      description: 'Soulbound ogrenci kimligi cuzdana hazir hale geldi.',
-      at: 'Simdi',
-      tone: 'positive',
-    });
-
     return buildSessionSnapshot();
   },
   async connectWallet() {
@@ -239,17 +217,23 @@ export const mockCampusApi = {
     await delay();
     return buildDashboardSnapshot();
   },
-  async getGuaranteeSnapshot(): Promise<GuaranteeSnapshot> {
-    await delay();
-    return {
-      exposures: clone(state.exposures),
-      requests: clone(state.requests),
-    };
-  },
   async getHistorySnapshot(): Promise<HistorySnapshot> {
     await delay();
     return {
       items: clone(state.activity),
+    };
+  },
+  async getPoolSnapshot(): Promise<PoolSnapshot> {
+    await delay();
+    return clone(state.poolPosition);
+  },
+  async getPoolQuote(amountMON: number, lockDays: number): Promise<PoolQuote> {
+    await delay(150);
+    return {
+      amountMON,
+      lockDays,
+      apyBps: GLOBAL_APY_BPS,
+      projectedInterestMON: calculatePoolInterest(amountMON, lockDays, GLOBAL_APY_BPS),
     };
   },
   async getLoanQuote(amountMON: number): Promise<LoanQuote> {
@@ -270,15 +254,6 @@ export const mockCampusApi = {
     const quote = await this.getLoanQuote(amountMON);
 
     if (quote.requiresGuarantee) {
-      state.requests.unshift({
-        id: `gr-${Date.now()}`,
-        friendName: 'Acil Kefalet Havuzu',
-        amountMON: Number((amountMON - state.creditLimit.availableMON).toFixed(2)),
-        message: `${purpose} icin limit ustu talep acildi.`,
-        requestedAt: 'Simdi',
-        status: 'Bekliyor',
-      });
-
       throw new Error('Bu tutar icin sosyal kefalet tamponu gerekli.');
     }
 
@@ -331,38 +306,72 @@ export const mockCampusApi = {
 
     return buildDashboardSnapshot();
   },
-  async approveGuaranteeRequest(requestId: string) {
+  async deposit(input: PoolDepositInput) {
     await delay(250);
-    const request = state.requests.find((item) => item.id === requestId);
+    const interest = calculatePoolInterest(input.amountMON, input.lockDays, GLOBAL_APY_BPS);
+    const deposit: PoolDeposit = {
+      id: `pd-${Date.now()}`,
+      amountMON: input.amountMON,
+      lockDays: input.lockDays,
+      apyBps: GLOBAL_APY_BPS,
+      depositedAt: 'Simdi',
+      maturesAt: `${input.lockDays} gun sonra`,
+      status: input.lockDays > 0 ? 'Aktif' : 'Cozulebilir',
+      projectedInterestMON: interest,
+    };
 
-    if (!request) {
-      throw new Error('Talep bulunamadi.');
-    }
-
-    request.status = 'Onaylandi';
-    state.exposures.unshift({
-      id: `gx-${Date.now()}`,
-      friendName: request.friendName,
-      amountMON: request.amountMON,
-      risk: request.amountMON > 2 ? 'Orta' : 'Dusuk',
-      status: 'Aktif',
-      note: 'Yeni kefalet tamponu eklendi.',
-    });
-    state.creditLimit.guaranteedMON = Number((state.creditLimit.guaranteedMON + request.amountMON).toFixed(2));
+    state.poolPosition.userDeposits.unshift(deposit);
+    state.poolPosition.totalDepositedMON = Number(
+      (state.poolPosition.totalDepositedMON + input.amountMON).toFixed(4),
+    );
+    state.poolPosition.availableLiquidityMON = Number(
+      (state.poolPosition.availableLiquidityMON + input.amountMON).toFixed(4),
+    );
+    state.poolPosition.projectedInterestMON = Number(
+      (state.poolPosition.projectedInterestMON + interest).toFixed(4),
+    );
     state.activity.unshift({
       id: `act-${Date.now()}`,
-      type: 'kefalet',
-      title: 'Kefalet talebi onaylandi',
-      description: `${request.friendName} icin sosyal guven tamponu aktiflesti.`,
+      type: 'havuz',
+      title: 'Havuz yatirimi yapildi',
+      description: `${input.amountMON} MON, ${input.lockDays} gunlugune kilitlendi.`,
       at: 'Simdi',
-      amountMON: request.amountMON,
+      amountMON: input.amountMON,
       tone: 'neutral',
     });
 
-    return {
-      exposures: clone(state.exposures),
-      requests: clone(state.requests),
-    };
+    return clone(state.poolPosition);
+  },
+  async withdraw(depositId: string) {
+    await delay(250);
+    const index = state.poolPosition.userDeposits.findIndex((item) => item.id === depositId);
+
+    if (index === -1) {
+      throw new Error('Yatirim bulunamadi.');
+    }
+
+    const deposit = state.poolPosition.userDeposits[index];
+    state.poolPosition.userDeposits.splice(index, 1);
+    state.poolPosition.totalDepositedMON = Number(
+      Math.max(0, state.poolPosition.totalDepositedMON - deposit.amountMON).toFixed(4),
+    );
+    state.poolPosition.availableLiquidityMON = Number(
+      Math.max(0, state.poolPosition.availableLiquidityMON - deposit.amountMON).toFixed(4),
+    );
+    state.poolPosition.projectedInterestMON = Number(
+      Math.max(0, state.poolPosition.projectedInterestMON - deposit.projectedInterestMON).toFixed(4),
+    );
+    state.activity.unshift({
+      id: `act-${Date.now()}`,
+      type: 'havuz',
+      title: 'Havuz yatirimi cekildi',
+      description: `${deposit.amountMON} MON ana para + faiz geri alindi.`,
+      at: 'Simdi',
+      amountMON: deposit.amountMON,
+      tone: 'positive',
+    });
+
+    return clone(state.poolPosition);
   },
   reset() {
     Object.assign(state, createInitialState());
