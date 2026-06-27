@@ -17,6 +17,7 @@ import type {
   WalletState,
 } from '@/shared/types/domain';
 import { calculateLoanFee, getPrimaryAction } from '@/shared/lib/calculations';
+import { formatYieldMON } from '@/shared/lib/formatters';
 
 interface MockCampusState {
   studentProfile: StudentProfile;
@@ -35,6 +36,9 @@ const GLOBAL_APY_BPS = 500;
 const calculatePoolInterest = (amountMON: number, lockDays: number, apyBps: number): number => {
   return Number(((amountMON * apyBps * lockDays) / (10_000 * 365)).toFixed(4));
 };
+
+const initialFirstDepositInterest = calculatePoolInterest(2, 30, GLOBAL_APY_BPS);
+const initialSecondDepositInterest = calculatePoolInterest(1.5, 7, GLOBAL_APY_BPS);
 
 const createInitialState = (): MockCampusState => ({
   studentProfile: {
@@ -116,7 +120,7 @@ const createInitialState = (): MockCampusState => ({
       id: 'act-2',
       type: 'havuz',
       title: 'Havuz yatirimi yapildi',
-      description: '2.0 MON, 30 gunlugune kilitlendi; tahmini faiz 0.08 MON.',
+      description: `2,0 MON, 30 gunlugune kilitlendi; tahmini faiz ${formatYieldMON(initialFirstDepositInterest)} MON.`,
       at: 'Bugun 09:05',
       amountMON: 2,
       tone: 'neutral',
@@ -136,7 +140,7 @@ const createInitialState = (): MockCampusState => ({
     totalBorrowedMON: 8.2,
     availableLiquidityMON: 16.3,
     globalApyBps: GLOBAL_APY_BPS,
-    projectedInterestMON: 0.21,
+    projectedInterestMON: Number((initialFirstDepositInterest + initialSecondDepositInterest).toFixed(4)),
     userDeposits: [
       {
         id: 'pd-1',
@@ -146,7 +150,7 @@ const createInitialState = (): MockCampusState => ({
         depositedAt: 'Bugun 09:05',
         maturesAt: '30 gun sonra',
         status: 'Aktif',
-        projectedInterestMON: calculatePoolInterest(2, 30, GLOBAL_APY_BPS),
+        projectedInterestMON: initialFirstDepositInterest,
       },
       {
         id: 'pd-2',
@@ -156,7 +160,7 @@ const createInitialState = (): MockCampusState => ({
         depositedAt: 'Dun',
         maturesAt: '5 gun sonra',
         status: 'Cozulebilir',
-        projectedInterestMON: calculatePoolInterest(1.5, 7, GLOBAL_APY_BPS),
+        projectedInterestMON: initialSecondDepositInterest,
       },
     ],
   },
@@ -335,7 +339,7 @@ export const mockCampusApi = {
       id: `act-${Date.now()}`,
       type: 'havuz',
       title: 'Havuz yatirimi yapildi',
-      description: `${input.amountMON} MON, ${input.lockDays} gunlugune kilitlendi.`,
+      description: `${input.amountMON} MON, ${input.lockDays} gunlugune kilitlendi; tahmini faiz ${formatYieldMON(interest)} MON.`,
       at: 'Simdi',
       amountMON: input.amountMON,
       tone: 'neutral',
@@ -366,7 +370,7 @@ export const mockCampusApi = {
       id: `act-${Date.now()}`,
       type: 'havuz',
       title: 'Havuz yatirimi cekildi',
-      description: `${deposit.amountMON} MON ana para + faiz geri alindi.`,
+      description: `${deposit.amountMON} MON ana para + ${formatYieldMON(deposit.projectedInterestMON)} MON faiz geri alindi.`,
       at: 'Simdi',
       amountMON: deposit.amountMON,
       tone: 'positive',

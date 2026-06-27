@@ -119,6 +119,18 @@ router.beforeEach(async (to) => {
     };
   }
 
+  if (!isInvestorMode.value && to.name === 'pool') {
+    if (isAppReady.value) {
+      return {
+        name: 'dashboard',
+      };
+    }
+
+    return {
+      name: 'onboarding',
+    };
+  }
+
   if (to.meta.requiresReady && !isAppReady.value) {
     if (isInvestorMode.value) {
       if (isWalletReady.value) {

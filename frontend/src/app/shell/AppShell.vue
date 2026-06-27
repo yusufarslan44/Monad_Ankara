@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import { ArrowUpRight, LogOut } from 'lucide-vue-next';
-import { desktopNavigation, investorNavigation, mobileMoreNavigation, mobileNavigation } from '@/app/config/navigation';
+import { investorNavigation, mobileMoreNavigation, mobileNavigation } from '@/app/config/navigation';
 import { useSessionStore } from '@/stores/session';
 import TopNav from '@/app/shell/TopNav.vue';
 import MobileTabBar from '@/app/shell/MobileTabBar.vue';
@@ -15,10 +14,6 @@ const route = useRoute();
 const router = useRouter();
 const { isInvestorMode } = storeToRefs(session);
 const showMore = ref(false);
-
-const filteredDesktopNavigation = computed(() =>
-  isInvestorMode.value ? investorNavigation : desktopNavigation,
-);
 
 const filteredMobileNavigation = computed(() =>
   isInvestorMode.value ? investorNavigation : mobileNavigation,
@@ -59,57 +54,7 @@ const disconnectWallet = async () => {
 
 <template>
   <div class="min-h-dvh px-4 pb-28 pt-4">
-    <div class="mx-auto max-w-[28rem] space-y-5">
-      <aside class="hidden">
-        <div class="surface-card sticky top-4 p-5">
-          <RouterLink to="/" class="flex items-center gap-3">
-            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-ink-950 text-lg font-bold text-white">
-              KM
-            </div>
-            <div>
-              <p class="font-display text-xl font-bold text-ink-950">KampusMON</p>
-              <p class="text-sm text-ink-700">Teminatsiz nano-lending</p>
-            </div>
-          </RouterLink>
-
-          <nav class="mt-6 space-y-1.5">
-            <RouterLink
-              v-for="item in filteredDesktopNavigation"
-              :key="item.label"
-              :to="item.to"
-              class="focus-ring flex min-h-11 items-center gap-3 rounded-2xl px-3.5 py-3 transition-colors"
-              :class="route.path === item.to ? 'bg-brand-100/80 text-brand-700' : 'text-ink-800 hover:bg-surface-0/90'"
-            >
-              <component :is="item.icon" class="h-5 w-5 shrink-0" />
-              <p class="font-semibold">{{ item.label }}</p>
-            </RouterLink>
-          </nav>
-
-          <div
-            v-if="!isInvestorMode"
-            class="mt-6 rounded-[1.25rem] border border-ink-300/40 bg-surface-1 p-4 text-ink-900"
-          >
-            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">Hizli islem</p>
-            <p class="mt-2 font-display text-lg font-bold">Yeni borc ac</p>
-            <RouterLink
-              to="/uygulama/borc-al"
-              class="focus-ring mt-4 inline-flex min-h-11 items-center gap-2 rounded-2xl bg-ink-950 px-4 py-3 text-sm font-semibold text-white"
-            >
-              Borc akisini ac
-              <ArrowUpRight class="h-4 w-4" />
-            </RouterLink>
-          </div>
-
-          <button
-            class="focus-ring mt-3 inline-flex min-h-11 items-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold text-ink-700"
-            @click="disconnectWallet"
-          >
-            <LogOut class="h-4 w-4" />
-            Cuzdani ayir
-          </button>
-        </div>
-      </aside>
-
+    <div class="mx-auto max-w-[24rem] space-y-4">
       <main class="space-y-5">
         <TopNav
           :title="currentHeading.title"
@@ -133,11 +78,16 @@ const disconnectWallet = async () => {
           v-for="item in filteredMobileMoreNavigation"
           :key="item.label"
           :to="item.to"
-          class="focus-ring flex min-h-11 items-center gap-3 rounded-2xl border border-ink-300/50 bg-white px-4 py-3"
+          class="focus-ring flex min-h-16 items-center gap-3 rounded-[1.35rem] border border-ink-300/50 bg-surface-1 px-4 py-3"
           @click="showMore = false"
         >
-          <component :is="item.icon" class="mt-0.5 h-5 w-5 shrink-0 text-brand-700" />
-          <p class="font-semibold text-ink-950">{{ item.label }}</p>
+          <div class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white text-brand-700 shadow-[var(--shadow-soft)]">
+            <component :is="item.icon" class="h-5 w-5" />
+          </div>
+          <div class="min-w-0">
+            <p class="font-semibold text-ink-950">{{ item.label }}</p>
+            <p class="mt-0.5 text-sm text-ink-700">{{ item.description }}</p>
+          </div>
         </RouterLink>
         <BaseButton variant="ghost" block @click="disconnectWallet">
           Cuzdani ayir

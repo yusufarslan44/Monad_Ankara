@@ -16,7 +16,7 @@ import {
 import { usePoolQuery } from '@/shared/composables/useAppQueries';
 import { dataAdapter } from '@/shared/adapters/dataAdapter';
 import { calculatePoolInterest } from '@/shared/lib/calculations';
-import { formatMON } from '@/shared/lib/formatters';
+import { formatMON, formatYieldMON } from '@/shared/lib/formatters';
 import { createPoolDepositSchema } from '@/shared/lib/formSchemas';
 import BaseButton from '@/shared/components/BaseButton.vue';
 import BaseCard from '@/shared/components/BaseCard.vue';
@@ -254,7 +254,7 @@ const chooseLock = (days: number) => {
                     Tahmini faiz
                   </p>
                   <p class="font-display text-xl font-bold text-ink-950">
-                    +{{ formatMON(deposit.projectedInterestMON) }} MON
+                    +{{ formatYieldMON(deposit.projectedInterestMON) }} MON
                   </p>
                 </div>
                 <div>
@@ -335,7 +335,7 @@ const chooseLock = (days: number) => {
                 <span>Tahmini getiri</span>
               </div>
               <p class="mt-1 font-display text-3xl font-bold text-ink-950">
-                +{{ formatMON(projectedInterest) }} MON
+                +{{ formatYieldMON(projectedInterest) }} MON
               </p>
               <p class="text-sm text-ink-700">Vade sonunda anapara + faiz iade edilir.</p>
             </div>
@@ -357,7 +357,7 @@ const chooseLock = (days: number) => {
             <p class="font-semibold text-ink-950">Yatirimi coz ve cek</p>
             <p class="mt-1 text-sm text-ink-700">
               {{ formatMON(selectedDeposit.amountMON) }} MON anapara +
-              {{ formatMON(selectedDeposit.projectedInterestMON) }} MON faiz iade alinacak.
+              {{ formatYieldMON(selectedDeposit.projectedInterestMON) }} MON faiz iade alinacak.
             </p>
           </div>
           <div class="flex gap-3">

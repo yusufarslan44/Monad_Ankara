@@ -4,6 +4,15 @@ export const formatMON = (value: number) =>
     maximumFractionDigits: 2,
   }).format(value);
 
+export const formatYieldMON = (value: number) => {
+  const absoluteValue = Math.abs(value);
+
+  return new Intl.NumberFormat('tr-TR', {
+    minimumFractionDigits: absoluteValue >= 1 || absoluteValue === 0 ? 2 : 4,
+    maximumFractionDigits: absoluteValue >= 1 ? 2 : 4,
+  }).format(value);
+};
+
 export const formatPercent = (value: number) =>
   new Intl.NumberFormat('tr-TR', {
     style: 'percent',

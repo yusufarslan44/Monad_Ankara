@@ -358,7 +358,7 @@ watch(
     </div>
 
     <nav class="fixed inset-x-3 bottom-3 z-40" aria-label="Kayit adimlari">
-      <div class="mx-auto max-w-xl rounded-[1.75rem] border border-white/80 bg-white/92 p-2 shadow-2xl backdrop-blur">
+      <div class="mx-auto max-w-[24rem] rounded-[1.5rem] border border-white/80 bg-white/92 p-1.5 shadow-2xl backdrop-blur">
         <ol :class="isInvestorMode ? 'grid-cols-2' : 'grid-cols-4'" class="grid gap-2">
           <li v-for="(step, index) in steps" :key="step.label">
             <div
@@ -368,7 +368,7 @@ watch(
                   ? 'bg-brand-100 text-brand-700 shadow-[inset_0_0_0_1px_rgba(229,36,42,0.12)]'
                   : 'text-ink-700'
               "
-              class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold transition-all duration-200 ease-[var(--ease-fluid)]"
+              class="flex min-h-9 flex-col items-center justify-center gap-0.5 rounded-[1rem] px-1.5 py-1.5 text-[10px] font-semibold transition-all duration-200 ease-[var(--ease-fluid)]"
             >
               <span
                 :class="
@@ -376,7 +376,7 @@ watch(
                     ? 'bg-brand-600 text-white'
                     : 'bg-cream-100 text-ink-700'
                 "
-                class="grid h-5 w-5 place-items-center rounded-full text-[10px] font-bold transition-all duration-200 ease-[var(--ease-fluid)]"
+                class="grid h-[1.125rem] w-[1.125rem] place-items-center rounded-full text-[9px] font-bold transition-all duration-200 ease-[var(--ease-fluid)]"
               >
                 {{ index + 1 }}
               </span>

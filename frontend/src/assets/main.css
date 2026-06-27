@@ -36,7 +36,9 @@
 @layer base {
   :root {
     color: var(--color-ink-950);
-    background: #f4f6f8;
+    background:
+      radial-gradient(circle at top, rgba(229, 36, 42, 0.12), transparent 28%),
+      linear-gradient(180deg, #f4f6f8 0%, #e9edf2 100%);
     font-family: var(--font-sans);
   }
 
@@ -56,6 +58,10 @@
     background: transparent;
     line-height: 1.5;
     text-rendering: optimizeLegibility;
+  }
+
+  #app {
+    min-height: 100vh;
   }
 
   a {
@@ -109,5 +115,35 @@
 
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-0;
+  }
+
+  .phone-stage {
+    background:
+      radial-gradient(circle at top, rgba(255, 255, 255, 0.45), transparent 34%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0));
+  }
+
+  .phone-frame {
+    position: relative;
+  }
+
+  .phone-frame::before,
+  .phone-frame::after {
+    content: "";
+    position: absolute;
+    right: -0.22rem;
+    width: 0.22rem;
+    border-radius: 999px;
+    background: rgba(32, 36, 43, 0.25);
+  }
+
+  .phone-frame::before {
+    top: 7rem;
+    height: 4.25rem;
+  }
+
+  .phone-frame::after {
+    top: 12.2rem;
+    height: 2.75rem;
   }
 }

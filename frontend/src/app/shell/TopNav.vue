@@ -46,33 +46,44 @@ const identityLabel = computed(() => {
 </script>
 
 <template>
-  <header class="surface-card flex flex-col gap-4 p-4">
-    <div class="flex flex-col gap-4">
+  <header class="surface-card relative z-10 flex flex-col gap-4 p-4">
+    <div class="flex items-start justify-between gap-3">
       <div>
-        <div class="label-chip mb-3">
-          Hesap ozeti
+        <div class="label-chip mb-2">
+          KampusMON
         </div>
         <p class="text-sm font-medium text-ink-700">Merhaba, {{ firstName }}</p>
-        <h1 class="mt-1 font-display text-[1.9rem] font-bold text-ink-950">{{ title }}</h1>
+        <h1 class="mt-1 font-display text-[1.8rem] font-bold text-ink-950">{{ title }}</h1>
+        <p v-if="subtitle" class="mt-1 text-sm text-ink-700">{{ subtitle }}</p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2.5">
-        <StatusBadge
-          :tone="identityTone"
-          :label="identityLabel"
-        />
-        <div class="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink-300/50 bg-surface-0 px-4 py-2 text-sm font-semibold text-ink-900">
-            <Wallet class="h-4 w-4 text-brand-700" />
-            {{ walletLabel }}
+      <button
+        v-if="showExitAction"
+        class="focus-ring inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border border-ink-300/50 bg-surface-0 px-3 py-2 text-sm font-semibold text-ink-900"
+        @click="emit('disconnect')"
+      >
+        <LogOut class="h-4 w-4 text-ink-700" />
+        Cikis
+      </button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="rounded-[1.25rem] border border-ink-300/50 bg-surface-0 px-4 py-3">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-700">Durum</p>
+        <div class="mt-2">
+          <StatusBadge
+            :tone="identityTone"
+            :label="identityLabel"
+          />
         </div>
-        <button
-          v-if="showExitAction"
-          class="focus-ring inline-flex min-h-11 items-center gap-2 rounded-full border border-ink-300/50 bg-surface-0 px-4 py-2 text-sm font-semibold text-ink-900"
-          @click="emit('disconnect')"
-        >
-          <LogOut class="h-4 w-4 text-ink-700" />
-          Cikis yap
-        </button>
+      </div>
+
+      <div class="rounded-[1.25rem] border border-ink-300/50 bg-surface-0 px-4 py-3">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-700">Cuzdan</p>
+        <div class="mt-2 inline-flex min-h-8 items-center gap-2 text-sm font-semibold text-ink-900">
+          <Wallet class="h-4 w-4 text-brand-700" />
+          <span class="truncate">{{ walletLabel }}</span>
+        </div>
       </div>
     </div>
   </header>
