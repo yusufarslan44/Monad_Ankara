@@ -28,7 +28,7 @@ export const desktopNavigation: NavItem[] = [
     icon: CreditCard,
   },
   {
-    label: 'Havuza Yatir',
+    label: 'Havuz',
     description: 'Likidite kilitle ve faiz kazan',
     to: '/uygulama/havuz',
     icon: PiggyBank,
@@ -49,7 +49,7 @@ export const desktopNavigation: NavItem[] = [
 
 export const investorNavigation: NavItem[] = [
   {
-    label: 'Havuza Yatir',
+    label: 'Havuz',
     description: 'Likidite kilitle ve faiz kazan',
     to: '/uygulama/havuz',
     icon: PiggyBank,
