@@ -8,7 +8,7 @@ describe('session store', () => {
     setupTestContext();
   });
 
-  it('hydrates and completes onboarding after email plus wallet', async () => {
+  it('hydrates and completes onboarding after wallet, email and code verification', async () => {
     const store = useSessionStore();
 
     const hydratePromise = store.hydrate();
@@ -17,20 +17,27 @@ describe('session store', () => {
 
     expect(store.identity.status).toBe('baslamadi');
 
-    const emailPromise = store.submitCampusEmail(
+    const walletPromise = store.connectWallet();
+    await vi.runAllTimersAsync();
+    await walletPromise;
+
+    expect(store.isWalletReady).toBe(true);
+
+    const verificationPromise = store.startVerification(
       'Derya Kaya',
       'Yildiz Teknik Universitesi',
       'derya@std.yildiz.edu.tr',
     );
     await vi.runAllTimersAsync();
-    await emailPromise;
+    await verificationPromise;
+
+    expect(store.identity.status).toBe('dogrulaniyor');
+
+    const codePromise = store.verifyCode('123456');
+    await vi.runAllTimersAsync();
+    await codePromise;
 
     expect(store.isIdentityReady).toBe(true);
-
-    const walletPromise = store.connectWallet();
-    await vi.runAllTimersAsync();
-    await walletPromise;
-
     expect(store.isAppReady).toBe(true);
   });
 });

@@ -4,9 +4,9 @@ import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { ArrowRight, ShieldCheck, Wallet } from 'lucide-vue-next';
+import { ArrowRight, Mail, ShieldCheck, Wallet } from 'lucide-vue-next';
 import { useSessionStore } from '@/stores/session';
-import { onboardingFormSchema } from '@/shared/lib/formSchemas';
+import { onboardingFormSchema, verificationCodeSchema } from '@/shared/lib/formSchemas';
 import BaseButton from '@/shared/components/BaseButton.vue';
 import BaseFormField from '@/shared/components/BaseFormField.vue';
 import StatusBadge from '@/shared/components/StatusBadge.vue';
@@ -15,30 +15,51 @@ const router = useRouter();
 const session = useSessionStore();
 const { identity, wallet, loading, isAppReady } = storeToRefs(session);
 
-const schema = toTypedSchema(onboardingFormSchema);
+const identitySchema = toTypedSchema(onboardingFormSchema);
+const codeSchema = toTypedSchema(verificationCodeSchema);
 
-const { errors, defineField, handleSubmit } = useForm({
-  validationSchema: schema,
+const { errors: identityErrors, defineField: defineIdentityField, handleSubmit: handleIdentitySubmit } = useForm({
+  validationSchema: identitySchema,
   initialValues: {
     name: 'Derya Kaya',
     university: 'Yildiz Teknik Universitesi',
     email: 'derya@std.yildiz.edu.tr',
+    referralCode: '',
   },
 });
 
-const [name, nameAttrs] = defineField('name');
-const [university, universityAttrs] = defineField('university');
-const [email, emailAttrs] = defineField('email');
+const [name, nameAttrs] = defineIdentityField('name');
+const [university, universityAttrs] = defineIdentityField('university');
+const [email, emailAttrs] = defineIdentityField('email');
+const [referralCode, referralCodeAttrs] = defineIdentityField('referralCode');
 
-const isIdentityStep = computed(() => identity.value.status !== 'dogrulandi');
-const isWalletStep = computed(() => identity.value.status === 'dogrulandi' && wallet.value.status !== 'bagli');
+const {
+  errors: codeErrors,
+  defineField: defineCodeField,
+  handleSubmit: handleCodeSubmit,
+  resetForm: resetCodeForm,
+} = useForm({
+  validationSchema: codeSchema,
+});
+
+const [code, codeAttrs] = defineCodeField('code');
+
+const isWalletStep = computed(() => wallet.value.status !== 'bagli');
+const isIdentityStep = computed(() => wallet.value.status === 'bagli' && identity.value.status === 'baslamadi');
+const isVerificationStep = computed(
+  () => wallet.value.status === 'bagli' && identity.value.status === 'dogrulaniyor',
+);
 
 const currentStep = computed(() => {
   if (isAppReady.value) {
+    return 3;
+  }
+
+  if (isVerificationStep.value) {
     return 2;
   }
 
-  if (identity.value.status === 'dogrulandi') {
+  if (isIdentityStep.value || wallet.value.status === 'bagli') {
     return 1;
   }
 
@@ -70,19 +91,19 @@ const walletHint = computed(() => {
 });
 
 const steps = [
-  {
-    label: 'Kimlik',
-  },
-  {
-    label: 'Cuzdan',
-  },
-  {
-    label: 'Panel',
-  },
+  { label: 'Cuzdan' },
+  { label: 'Kimlik' },
+  { label: 'Dogrulama' },
+  { label: 'Panel' },
 ];
 
-const onSubmit = handleSubmit(async (values) => {
-  await session.submitCampusEmail(values.name, values.university, values.email);
+const onIdentitySubmit = handleIdentitySubmit(async (values) => {
+  await session.startVerification(values.name, values.university, values.email, values.referralCode || undefined);
+  resetCodeForm();
+});
+
+const onCodeSubmit = handleCodeSubmit(async (values) => {
+  await session.verifyCode(values.code);
 });
 
 const handleWalletAction = async () => {
@@ -119,7 +140,33 @@ watch(
         </div>
 
         <div class="mt-6 space-y-4 sm:space-y-5">
-          <form v-if="isIdentityStep" class="space-y-5" @submit="onSubmit">
+          <!-- Adim 1: Cuzdan -->
+          <div v-if="isWalletStep" class="space-y-5">
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <div class="grid h-11 w-11 place-items-center rounded-2xl bg-amber-100 text-amber-500">
+                  <Wallet class="h-5 w-5" />
+                </div>
+                <div>
+                  <p class="font-semibold text-ink-950">Cuzdan baglama</p>
+                </div>
+              </div>
+              <StatusBadge tone="warning" label="Cuzdan bekleniyor" />
+            </div>
+
+            <div class="space-y-1 rounded-2xl border border-ink-300/50 bg-white px-4 py-4">
+              <p class="text-sm text-ink-700">{{ walletHint }}</p>
+              <p v-if="wallet.address" class="mt-1 break-words text-sm text-ink-700">{{ wallet.address }}</p>
+            </div>
+
+            <BaseButton :disabled="loading" block @click="handleWalletAction()">
+              {{ walletButtonLabel }}
+              <ArrowRight class="h-4 w-4" />
+            </BaseButton>
+          </div>
+
+          <!-- Adim 2: Kimlik bilgileri -->
+          <form v-else-if="isIdentityStep" class="space-y-5" @submit="onIdentitySubmit">
             <div class="space-y-2">
               <div class="flex items-center gap-3">
                 <div class="grid h-11 w-11 place-items-center rounded-2xl bg-brand-100 text-brand-700">
@@ -135,7 +182,7 @@ watch(
             <div class="grid gap-4 sm:grid-cols-2">
               <BaseFormField
                 label="Ad Soyad"
-                :error="errors.name"
+                :error="identityErrors.name"
                 required
               >
                 <input
@@ -149,7 +196,7 @@ watch(
 
               <BaseFormField
                 label="Universite"
-                :error="errors.university"
+                :error="identityErrors.university"
                 required
               >
                 <input
@@ -164,7 +211,7 @@ watch(
 
             <BaseFormField
               label="Okul e-postasi"
-              :error="errors.email"
+              :error="identityErrors.email"
               required
             >
               <input
@@ -178,43 +225,72 @@ watch(
               />
             </BaseFormField>
 
+            <BaseFormField
+              label="Davet kodu (opsiyonel)"
+              :error="identityErrors.referralCode"
+            >
+              <input
+                v-model="referralCode"
+                v-bind="referralCodeAttrs"
+                class="focus-ring min-h-11 w-full rounded-2xl border border-ink-300/50 bg-white px-4 py-3 text-[16px] text-ink-950"
+                placeholder="MON-XXXXXX"
+              />
+            </BaseFormField>
+
             <BaseButton :disabled="loading" type="submit" block>
-              Kampus kimligini olustur
+              Dogrulama kodu gonder
+              <Mail class="h-4 w-4" />
             </BaseButton>
           </form>
 
-          <div v-else-if="isWalletStep" class="space-y-5">
+          <!-- Adim 3: Kod dogrulama -->
+          <form v-else-if="isVerificationStep" class="space-y-5" @submit="onCodeSubmit">
             <div class="space-y-2">
               <div class="flex items-center gap-3">
-                <div class="grid h-11 w-11 place-items-center rounded-2xl bg-amber-100 text-amber-500">
-                  <Wallet class="h-5 w-5" />
+                <div class="grid h-11 w-11 place-items-center rounded-2xl bg-brand-100 text-brand-700">
+                  <Mail class="h-5 w-5" />
                 </div>
                 <div>
-                  <p class="font-semibold text-ink-950">Cuzdan baglama</p>
+                  <p class="font-semibold text-ink-950">E-posta dogrulama</p>
                 </div>
               </div>
-              <StatusBadge tone="success" label="Kimlik dogrulandi" />
+              <StatusBadge tone="warning" label="Kod bekleniyor" />
             </div>
 
-            <div class="space-y-1 rounded-2xl border border-ink-300/50 bg-white px-4 py-4">
-              <p class="break-words font-semibold text-ink-950">{{ identity.email }}</p>
-              <p class="text-sm text-ink-700">{{ session.studentProfile.university }}</p>
-              <p class="mt-3 text-sm text-ink-700">{{ walletHint }}</p>
-              <p v-if="wallet.address" class="mt-1 break-words text-sm text-ink-700">{{ wallet.address }}</p>
+            <div class="rounded-2xl border border-ink-300/50 bg-white px-4 py-4">
+              <p class="text-sm text-ink-700">
+                <span class="font-semibold text-ink-950">{{ identity.email }}</span> adresine 6 haneli kod gonderildi.
+                Spam kutusunu da kontrol etmeyi unutma.
+              </p>
             </div>
 
-            <BaseButton :disabled="loading" block @click="handleWalletAction()">
-              {{ walletButtonLabel }}
+            <BaseFormField
+              label="Dogrulama kodu"
+              :error="codeErrors.code"
+              required
+            >
+              <input
+                v-model="code"
+                v-bind="codeAttrs"
+                inputmode="numeric"
+                maxlength="6"
+                class="focus-ring min-h-11 w-full rounded-2xl border border-ink-300/50 bg-white px-4 py-3 text-[16px] text-ink-950"
+                placeholder="123456"
+              />
+            </BaseFormField>
+
+            <BaseButton :disabled="loading" type="submit" block>
+              Kodu dogrula
               <ArrowRight class="h-4 w-4" />
             </BaseButton>
-          </div>
+          </form>
         </div>
       </section>
     </div>
 
     <nav class="fixed inset-x-3 bottom-3 z-40" aria-label="Kayit adimlari">
       <div class="mx-auto max-w-xl rounded-[1.75rem] border border-white/80 bg-white/92 p-2 shadow-2xl backdrop-blur">
-        <ol class="grid grid-cols-3 gap-2">
+        <ol class="grid grid-cols-4 gap-2">
           <li v-for="(step, index) in steps" :key="step.label">
             <div
               :aria-current="index === currentStep ? 'step' : undefined"

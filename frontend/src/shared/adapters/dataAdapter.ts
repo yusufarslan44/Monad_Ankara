@@ -2,8 +2,6 @@ import { mockCampusApi } from '@/shared/mocks/mockCampusState';
 
 export const dataAdapter = {
   getSessionSnapshot: () => mockCampusApi.getSessionSnapshot(),
-  submitCampusEmail: (name: string, university: string, email: string) =>
-    mockCampusApi.submitCampusEmail(name, university, email),
   getDashboardSnapshot: () => mockCampusApi.getDashboardSnapshot(),
   getGuaranteeSnapshot: () => mockCampusApi.getGuaranteeSnapshot(),
   getHistorySnapshot: () => mockCampusApi.getHistorySnapshot(),
