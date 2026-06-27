@@ -126,3 +126,5 @@ Kullanıcı belgesini güncelle. 200 { success: true, code }.
 Tüm controller metotları try-catch bloklarıyla sarılmalı, hatalar console.error ile loglanmalı ve middleware/errorHandler.js vasıtasıyla { success: false, error: "Mesaj" } formatında dönmelidir.
 
 Test dosyaları (tests/) yukarıda belirtilen tüm başarılı akışları, geçersiz e-posta/kod denemelerini, 60sn rate-limit sınırını, cüzdan uyuşmazlıklarını ve referans çakışma senaryolarını Jest ile tam kapsamlı test etmelidir.
+
+backendi C:\Users\HP\Desktop\Monad_Ankara\shared\README.md akıllı kontratlarıyla uyumlu yap akıllı kontrat yapısına kesinlikle dokunma akıllı kontratları backende implement et
