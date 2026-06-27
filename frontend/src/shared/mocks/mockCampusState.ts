@@ -31,7 +31,7 @@ interface MockCampusState {
   poolPosition: PoolSnapshot;
 }
 
-const GLOBAL_APY_BPS = 500;
+const GLOBAL_APY_BPS = 1500;
 
 const calculatePoolInterest = (amountMON: number, lockDays: number, apyBps: number): number => {
   return Number(((amountMON * apyBps * lockDays) / (10_000 * 365)).toFixed(4));

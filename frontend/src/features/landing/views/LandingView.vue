@@ -41,25 +41,25 @@ const pillars = [
               teminatsiz, seffaf ve sosyal guven tabanli bir deneyime donusturur.
             </p>
             <div class="mt-8 flex flex-col gap-3">
-              <RouterLink to="/uygulama?mod=kayit">
-                <BaseButton>
+              <RouterLink to="/uygulama?mod=kayit" class="block w-full">
+                <BaseButton block>
                   Kayit ol
                   <ArrowRight class="h-4 w-4" />
                 </BaseButton>
               </RouterLink>
-              <RouterLink to="/uygulama?mod=giris">
-                <BaseButton variant="ghost">
+              <RouterLink to="/uygulama?mod=giris" class="block w-full">
+                <BaseButton variant="ghost" block>
                   Giris yap
                 </BaseButton>
               </RouterLink>
-              <RouterLink to="/uygulama?rol=yatirimci">
-                <BaseButton variant="secondary">
+              <RouterLink to="/uygulama?rol=yatirimci" class="block w-full">
+                <BaseButton variant="secondary" block>
                   Yatirimci girisi
                   <PiggyBank class="h-4 w-4" />
                 </BaseButton>
               </RouterLink>
-              <a href="#neden-monad">
-                <BaseButton variant="ghost">Neden Monad?</BaseButton>
+              <a href="#neden-monad" class="block w-full">
+                <BaseButton variant="ghost" block>Neden Monad?</BaseButton>
               </a>
             </div>
             <dl class="mt-10 grid gap-4">
