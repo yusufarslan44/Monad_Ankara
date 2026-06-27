@@ -15,3 +15,9 @@
 # Allow committed examples
 !.env.example
 !**/.env.example
+
+# Foundry build artifacts
+contract/out/
+contract/cache/
+contract/broadcast/
+contract/lib/
