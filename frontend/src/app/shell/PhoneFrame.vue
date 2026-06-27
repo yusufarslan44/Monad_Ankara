@@ -4,7 +4,7 @@
       <div class="pointer-events-none flex justify-center pt-3">
         <div class="h-1.5 w-24 rounded-full bg-ink-950/85" />
       </div>
-      <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div class="no-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <slot />
       </div>
     </div>
