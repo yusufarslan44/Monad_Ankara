@@ -101,7 +101,7 @@ export const useSessionStore = defineStore('session', {
     },
     bindWalletEvents() {
       if (removeWalletSubscription) {
-        return;
+        removeWalletSubscription();
       }
 
       removeWalletSubscription = walletAdapter.subscribe((wallet) => {

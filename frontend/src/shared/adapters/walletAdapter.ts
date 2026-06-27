@@ -15,18 +15,34 @@ type EthereumProvider = {
   removeListener: (event: 'accountsChanged' | 'chainChanged', listener: (...args: unknown[]) => void) => void;
 };
 
+type BrowserEthereum = EthereumProvider & {
+  providers?: EthereumProvider[];
+};
+
 type WalletListener = (wallet: WalletState) => void;
 
 const DISCONNECT_KEY = 'campusmon.wallet.disconnected';
 const IS_TEST =
   import.meta.env.MODE === 'test' || import.meta.env.VITEST === 'true';
 
-const getProvider = (): EthereumProvider | undefined => {
+const getMetaMaskProvider = (): EthereumProvider | undefined => {
   if (typeof window === 'undefined') {
     return undefined;
   }
 
-  return (window as Window & { ethereum?: EthereumProvider }).ethereum;
+  const ethereum = (window as Window & { ethereum?: BrowserEthereum }).ethereum;
+  if (!ethereum) {
+    return undefined;
+  }
+
+  if (Array.isArray(ethereum.providers)) {
+    const metamaskProvider = ethereum.providers.find((provider) => provider.isMetaMask);
+    if (metamaskProvider) {
+      return metamaskProvider;
+    }
+  }
+
+  return ethereum.isMetaMask ? ethereum : undefined;
 };
 
 const isManuallyDisconnected = () => {
@@ -53,13 +69,15 @@ const setManualDisconnect = (value: boolean) => {
 const buildWalletState = (overrides: Partial<WalletState> = {}): WalletState => ({
   status: 'bagli-degil',
   network: monadNetwork.chainName,
-  isInstalled: Boolean(getProvider()),
+  isInstalled: Boolean(getMetaMaskProvider()),
   isSupportedNetwork: false,
   providerLabel: 'MetaMask',
   ...overrides,
 });
 
-const isSupportedChain = (chainId?: string) => chainId === monadNetwork.chainIdHex;
+const normalizeChainId = (chainId?: string) => chainId?.toLowerCase().trim() ?? '';
+const isSupportedChain = (chainId?: string) =>
+  normalizeChainId(chainId) === monadNetwork.chainIdHex.toLowerCase();
 
 const mapProviderError = (error: unknown) => {
   if (typeof error === 'object' && error && 'code' in error) {
@@ -162,15 +180,22 @@ const ensureMonadNetwork = async (provider: EthereumProvider) => {
   }
 };
 
+let attachedProvider: EthereumProvider | null = null;
 let removeProviderListeners: (() => void) | null = null;
 
 const attachProviderListeners = (listener: WalletListener) => {
+  const provider = getMetaMaskProvider();
+
+  if (attachedProvider === provider && removeProviderListeners) {
+    return removeProviderListeners;
+  }
+
   if (removeProviderListeners) {
     removeProviderListeners();
     removeProviderListeners = null;
   }
 
-  const provider = getProvider();
+  attachedProvider = provider;
 
   if (!provider) {
     return () => {};
@@ -213,7 +238,7 @@ export const walletAdapter = {
       return null;
     }
 
-    const provider = getProvider();
+    const provider = getMetaMaskProvider();
 
     if (!provider) {
       return buildWalletState({
@@ -229,7 +254,7 @@ export const walletAdapter = {
       return mockCampusApi.connectWallet();
     }
 
-    const provider = getProvider();
+    const provider = getMetaMaskProvider();
 
     if (!provider) {
       return getDisconnectedSnapshot(
@@ -269,7 +294,7 @@ export const walletAdapter = {
 
     return getDisconnectedSnapshot(
       buildWalletState({
-        isInstalled: Boolean(getProvider()),
+        isInstalled: Boolean(getMetaMaskProvider()),
       }),
     );
   },
