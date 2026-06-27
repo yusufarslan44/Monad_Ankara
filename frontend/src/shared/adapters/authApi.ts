@@ -23,10 +23,18 @@ export type ResolveReferralResponse = {
 };
 
 export const authApi = {
-  requestCode(address: string, email: string, referralCode?: string) {
+  requestCode(
+    address: string,
+    email: string,
+    name: string,
+    university: string,
+    referralCode?: string,
+  ) {
     return apiClient.post<RequestCodeResponse>('/auth/request-code', {
       address,
       email,
+      name,
+      university,
       referralCode: referralCode || undefined,
     });
   },

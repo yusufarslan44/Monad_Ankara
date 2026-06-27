@@ -29,6 +29,16 @@ const verificationCodeSchema = new mongoose.Schema({
     default: null,
   },
 
+  // Onboarding profili (verify-code sirasinda User'a aktarilir).
+  name: {
+    type: String,
+    default: '',
+  },
+  university: {
+    type: String,
+    default: '',
+  },
+
   // Kodun gecerlilik bitis zamani. TTL index ile suresi dolan belgeler silinir.
   expiresAt: {
     type: Date,

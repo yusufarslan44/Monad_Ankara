@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import DashboardView from '@/features/dashboard/views/DashboardView.vue';
+import { useSessionStore } from '@/stores/session';
 import { setupTestContext } from '@/tests/test-utils';
 
 describe('dashboard view', () => {
@@ -8,8 +9,15 @@ describe('dashboard view', () => {
     vi.useFakeTimers();
   });
 
-  it('renders core dashboard metrics', async () => {
+  it('renders simplified dashboard metrics', async () => {
     const { pinia, vueQueryPlugin, stubs } = setupTestContext();
+    const session = useSessionStore();
+    session.wallet = {
+      ...session.wallet,
+      status: 'bagli',
+      address: '0x9f4202C0B16bD96ce821bFCC0C4BbA9469522635',
+      isSupportedNetwork: true,
+    };
 
     const wrapper = mount(DashboardView, {
       global: {
@@ -22,7 +30,7 @@ describe('dashboard view', () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain('Kullanilabilir limit');
-    expect(wrapper.text()).toContain('Itibar puani');
+    expect(wrapper.text()).toContain('Acik borc');
     expect(wrapper.text()).toContain('Son hareketler');
   });
 });

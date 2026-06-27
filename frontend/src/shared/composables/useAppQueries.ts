@@ -4,23 +4,35 @@ import { dataAdapter } from '@/shared/adapters/dataAdapter';
 import { calculateRepaymentLift } from '@/shared/lib/calculations';
 import { useSessionStore } from '@/stores/session';
 
-export const useDashboardQuery = () =>
-  useQuery({
-    queryKey: ['dashboard'],
-    queryFn: () => dataAdapter.getDashboardSnapshot(),
-  });
+export const useDashboardQuery = () => {
+  const session = useSessionStore();
 
-export const usePoolQuery = () =>
-  useQuery({
-    queryKey: ['pool'],
-    queryFn: () => dataAdapter.getPoolSnapshot(),
+  return useQuery({
+    queryKey: ['dashboard', () => session.wallet.address],
+    queryFn: () => dataAdapter.getDashboardSnapshot(session.wallet.address),
+    enabled: () => Boolean(session.wallet.address),
   });
+};
 
-export const useHistoryQuery = () =>
-  useQuery({
-    queryKey: ['history'],
-    queryFn: () => dataAdapter.getHistorySnapshot(),
+export const usePoolQuery = () => {
+  const session = useSessionStore();
+
+  return useQuery({
+    queryKey: ['pool', () => session.wallet.address],
+    queryFn: () => dataAdapter.getPoolSnapshot(session.wallet.address),
+    enabled: () => Boolean(session.wallet.address),
   });
+};
+
+export const useHistoryQuery = () => {
+  const session = useSessionStore();
+
+  return useQuery({
+    queryKey: ['history', () => session.wallet.address],
+    queryFn: () => dataAdapter.getHistorySnapshot(session.wallet.address),
+    enabled: () => Boolean(session.wallet.address),
+  });
+};
 
 export const useRepaymentProjection = (amount: () => number) => {
   const { data } = useDashboardQuery();

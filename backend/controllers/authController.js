@@ -18,7 +18,7 @@ const RATE_LIMIT_MS = 60 * 1000; // 60 saniye
  */
 async function requestCode(req, res, next) {
   try {
-    const { address, email, referralCode } = req.body || {};
+    const { address, email, referralCode, name, university } = req.body || {};
 
     if (!address || !email) {
       return res
@@ -72,6 +72,8 @@ async function requestCode(req, res, next) {
       code,
       address: normalizedAddress,
       referralCode: referralCode || null,
+      name: String(name || '').trim(),
+      university: String(university || '').trim(),
       expiresAt: new Date(Date.now() + CODE_TTL_MS),
     });
 
@@ -153,6 +155,8 @@ async function verifyCode(req, res, next) {
           emailDomain: normalizedEmail.split("@")[1],
           inviterAddress,
           verified: true,
+          name: verification.name || '',
+          university: verification.university || '',
         },
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }

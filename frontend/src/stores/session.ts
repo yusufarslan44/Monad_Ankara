@@ -135,6 +135,12 @@ export const useSessionStore = defineStore('session', {
       }
     },
     async startVerification(name: string, university: string, email: string, referralCode?: string) {
+      this.studentProfile = {
+        ...this.studentProfile,
+        name,
+        university,
+        email,
+      };
       if (!this.wallet.address) {
         throw new Error('Once cuzdanini baglamalisin.');
       }
@@ -142,13 +148,6 @@ export const useSessionStore = defineStore('session', {
       this.loading = true;
 
       try {
-        this.studentProfile = {
-          ...this.studentProfile,
-          name,
-          university,
-          email,
-        };
-
         if (IS_TEST) {
           // Test ortaminda backend cagrisi simule edilir
           this.identity = {
@@ -158,7 +157,7 @@ export const useSessionStore = defineStore('session', {
             soulboundReady: false,
           };
         } else {
-          await authApi.requestCode(this.wallet.address, email, referralCode);
+          await authApi.requestCode(this.wallet.address, email, name, university, referralCode);
 
           this.identity = {
             status: 'dogrulaniyor',

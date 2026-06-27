@@ -10,6 +10,16 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
 
+  // Kullanici profili (onboarding'den gelir).
+  name: {
+    type: String,
+    default: '',
+  },
+  university: {
+    type: String,
+    default: '',
+  },
+
   // E-posta keccak256 hash'i — 0x ile baslayan 66 karakter.
   emailHash: {
     type: String,

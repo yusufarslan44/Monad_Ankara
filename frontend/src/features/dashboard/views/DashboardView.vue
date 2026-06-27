@@ -1,149 +1,123 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
-import { ArrowRight, HandCoins, PiggyBank, Sparkles, WalletCards } from 'lucide-vue-next';
+import { ArrowRight, PiggyBank, WalletCards } from 'lucide-vue-next';
 import { useDashboardQuery } from '@/shared/composables/useAppQueries';
-import { calculateUsageRatio } from '@/shared/lib/calculations';
 import { formatMON } from '@/shared/lib/formatters';
 import BaseButton from '@/shared/components/BaseButton.vue';
 import BaseCard from '@/shared/components/BaseCard.vue';
-import CreditGauge from '@/shared/components/CreditGauge.vue';
-import StatCard from '@/shared/components/StatCard.vue';
 import TimelineList from '@/shared/components/TimelineList.vue';
 
-const { data } = useDashboardQuery();
-
-const usageRatio = computed(() => {
-  if (!data.value) {
-    return 0;
-  }
-
-  return calculateUsageRatio(data.value.creditLimit, data.value.loanPosition);
-});
+const { data, isLoading } = useDashboardQuery();
 
 const firstName = computed(() => data.value?.studentProfile.name.split(' ')[0] ?? 'Kullanici');
-const actionHref = computed(() => (data.value?.nextAction === 'borc-al' ? '/uygulama/borc-al' : '/uygulama/odeme'));
-const actionLabel = computed(() => (data.value?.nextAction === 'borc-al' ? 'Borc al' : 'Odeme yap'));
-const userPoolTotal = computed(() =>
-  data.value?.poolPosition.userDeposits.reduce((sum, deposit) => sum + deposit.amountMON, 0) ?? 0,
+const hasDebt = computed(() => (data.value?.loanPosition.outstandingMON || 0) > 0);
+
+const primaryAction = computed(() => {
+  if (!data.value) {
+    return { label: 'Yukleniyor', href: '#' };
+  }
+
+  return hasDebt.value
+    ? { label: 'Borc odeme', href: '/uygulama/odeme' }
+    : { label: 'Hemen borc al', href: '/uygulama/borc-al' };
+});
+
+const userPoolTotal = computed(
+  () => data.value?.poolPosition.userDeposits.reduce((sum, deposit) => sum + deposit.amountMON, 0) ?? 0,
 );
 </script>
 
 <template>
-  <div v-if="data" class="space-y-5">
-    <BaseCard>
-      <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+  <div v-if="data" class="mx-auto max-w-4xl space-y-5">
+    <!-- Karsilama ve ana aksiyon -->
+    <BaseCard class="relative overflow-hidden">
+      <div class="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p class="text-sm font-medium text-ink-700">Hos geldin, {{ firstName }}</p>
           <h2 class="mt-2 font-display text-3xl font-bold text-ink-950 sm:text-[2.3rem]">
-            {{ data.nextAction === 'borc-al' ? 'Hazir limitin var.' : 'Odeme zamani.' }}
+            {{ hasDebt ? 'Acik borcun var.' : 'Limitin hazir.' }}
           </h2>
+          <p class="mt-2 text-sm text-ink-700">
+            {{ hasDebt ? 'Kademeli odeyerek limitini yeniden ac.' : 'Ihtiyac aninda teminatsiz kredi cekebilirsin.' }}
+          </p>
         </div>
-
-        <div class="flex flex-col gap-3 sm:flex-row">
-          <RouterLink :to="actionHref">
-            <BaseButton>
-              {{ actionLabel }}
-              <ArrowRight class="h-4 w-4" />
-            </BaseButton>
-          </RouterLink>
-          <RouterLink to="/uygulama/gecmis">
-            <BaseButton variant="ghost">Son hareketler</BaseButton>
-          </RouterLink>
-        </div>
+        <RouterLink :to="primaryAction.href">
+          <BaseButton>
+            {{ primaryAction.label }}
+            <ArrowRight class="h-4 w-4" />
+          </BaseButton>
+        </RouterLink>
       </div>
     </BaseCard>
 
-    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <StatCard
-        eyebrow="Kullanilabilir limit"
-        :value="`${formatMON(data.creditLimit.availableMON)} MON`"
-        detail="Su an kullanilabilir"
-        :trend="data.creditLimit.scoreBand"
-      />
-      <StatCard
-        eyebrow="Acik borc"
-        :value="`${formatMON(data.loanPosition.outstandingMON)} MON`"
-        detail="Kademeli odeme acik"
-      />
-      <StatCard
-        eyebrow="Itibar puani"
-        :value="`${data.reputation.score}/100`"
-        detail="Odeme ritmiyle guncellenir"
-        :trend="data.reputation.trend"
-      />
-      <StatCard
-        eyebrow="Sonraki acilis"
-        :value="`${formatMON(data.creditLimit.nextUnlockMON)} MON`"
-        detail="Bir sonraki alan"
-      />
-    </section>
-
-    <section class="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
-      <CreditGauge
-        :value="usageRatio"
-        label="Limit dengesi"
-        detail="Yukselirse baski artar."
-      />
+    <!-- Temel iki kart -->
+    <section class="grid gap-4 sm:grid-cols-2">
+      <BaseCard>
+        <div class="flex items-start gap-3">
+          <div class="grid h-11 w-11 place-items-center rounded-2xl bg-success-100 text-success-500">
+            <WalletCards class="h-5 w-5" />
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-ink-700">Kullanilabilir limit</p>
+            <p class="mt-1 font-display text-3xl font-bold text-ink-950">{{ formatMON(data.creditLimit.availableMON) }} MON</p>
+            <p class="mt-1 text-xs text-ink-600">Toplam: {{ formatMON(data.creditLimit.totalMON) }} MON</p>
+          </div>
+        </div>
+      </BaseCard>
 
       <BaseCard>
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 class="font-display text-2xl font-bold text-ink-950">Son hareketler</h2>
-          <RouterLink to="/uygulama/gecmis">
-            <BaseButton variant="ghost">Tum gecmis</BaseButton>
-          </RouterLink>
-        </div>
-        <div class="mt-5">
-          <TimelineList :items="data.activity.slice(0, 2)" :show-description="false" />
+        <div class="flex items-start gap-3">
+          <div class="grid h-11 w-11 place-items-center rounded-2xl bg-brand-100 text-brand-700">
+            <ArrowRight class="h-5 w-5" />
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-ink-700">Acik borc</p>
+            <p class="mt-1 font-display text-3xl font-bold text-ink-950">{{ formatMON(data.loanPosition.outstandingMON) }} MON</p>
+            <p class="mt-1 text-xs text-ink-600">Anapara: {{ formatMON(data.loanPosition.principalMON) }} MON</p>
+          </div>
         </div>
       </BaseCard>
     </section>
 
-    <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
-        <div class="flex items-start gap-3">
-          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-brand-100 text-brand-700">
-            <WalletCards class="h-4 w-4" />
+    <!-- Havuz ozeti -->
+    <RouterLink to="/uygulama/havuz" class="block">
+      <BaseCard class="transition-colors hover:bg-cream-50/50">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-start gap-3">
+            <div class="grid h-11 w-11 place-items-center rounded-2xl bg-coral-100 text-coral-500">
+              <PiggyBank class="h-5 w-5" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-ink-700">Havuz yatirimim</p>
+              <p class="mt-1 font-display text-2xl font-bold text-ink-950">{{ formatMON(userPoolTotal) }} MON</p>
+              <p class="mt-1 text-xs text-ink-600">APY: %{{ data.poolPosition.globalApyBps / 100 }}</p>
+            </div>
           </div>
-          <div>
-            <p class="font-semibold text-ink-950">Kimlik aktif</p>
-            <p class="mt-1 text-sm text-ink-700">{{ data.studentProfile.university }}</p>
-          </div>
+          <ArrowRight class="h-5 w-5 text-ink-400" />
         </div>
+      </BaseCard>
+    </RouterLink>
+
+    <!-- Son hareketler -->
+    <BaseCard>
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="font-display text-xl font-bold text-ink-950">Son hareketler</h3>
+        <RouterLink to="/uygulama/gecmis">
+          <BaseButton variant="ghost" class="text-sm">Tumunu gor</BaseButton>
+        </RouterLink>
       </div>
-      <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
-        <div class="flex items-start gap-3">
-          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-amber-100 text-amber-500">
-            <HandCoins class="h-4 w-4" />
-          </div>
-          <div>
-            <p class="font-semibold text-ink-950">Acilabilir alan</p>
-            <p class="mt-1 text-sm text-ink-700">{{ formatMON(data.creditLimit.nextUnlockMON) }} MON</p>
-          </div>
-        </div>
+      <div class="mt-4">
+        <TimelineList :items="data.activity.slice(0, 3)" :show-description="false" />
       </div>
-      <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
-        <div class="flex items-start gap-3">
-          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-coral-100 text-coral-500">
-            <PiggyBank class="h-4 w-4" />
-          </div>
-          <div>
-            <p class="font-semibold text-ink-950">Havuz yatirimim</p>
-            <p class="mt-1 text-sm text-ink-700">{{ formatMON(userPoolTotal) }} MON</p>
-          </div>
-        </div>
-      </div>
-      <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
-        <div class="flex items-start gap-3">
-          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-success-100 text-success-500">
-            <Sparkles class="h-4 w-4" />
-          </div>
-          <div>
-            <p class="font-semibold text-ink-950">Itibar</p>
-            <p class="mt-1 text-sm text-ink-700">{{ data.reputation.trend }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
+    </BaseCard>
+  </div>
+
+  <div v-else-if="isLoading" class="space-y-5">
+    <BaseCard class="min-h-32 animate-pulse bg-surface-0" />
+    <div class="grid gap-4 sm:grid-cols-2">
+      <BaseCard class="min-h-32 animate-pulse bg-surface-0" />
+      <BaseCard class="min-h-32 animate-pulse bg-surface-0" />
+    </div>
   </div>
 </template>
