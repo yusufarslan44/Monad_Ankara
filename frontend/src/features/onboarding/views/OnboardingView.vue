@@ -183,10 +183,10 @@ watch(
               :aria-current="index === currentStep ? 'step' : undefined"
               :class="
                 index <= currentStep
-                  ? 'bg-brand-100 text-brand-700'
+                  ? 'bg-brand-100 text-brand-700 shadow-[inset_0_0_0_1px_rgba(229,36,42,0.12)]'
                   : 'text-ink-700'
               "
-              class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold"
+              class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold transition-all duration-200 ease-[var(--ease-fluid)]"
             >
               <span
                 :class="
@@ -194,11 +194,16 @@ watch(
                     ? 'bg-brand-600 text-white'
                     : 'bg-cream-100 text-ink-700'
                 "
-                class="grid h-5 w-5 place-items-center rounded-full text-[10px] font-bold"
+                class="grid h-5 w-5 place-items-center rounded-full text-[10px] font-bold transition-all duration-200 ease-[var(--ease-fluid)]"
               >
                 {{ index + 1 }}
               </span>
-              <span>{{ step.label }}</span>
+              <span
+                class="transition-transform duration-200 ease-[var(--ease-fluid)]"
+                :class="index === currentStep ? '-translate-y-0.5' : ''"
+              >
+                {{ step.label }}
+              </span>
             </div>
           </li>
         </ol>

@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <article class="surface-muted p-5 sm:p-6">
+  <article class="rounded-[1.25rem] border border-ink-300/50 bg-white p-5 sm:p-6">
     <p class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">
       {{ eyebrow }}
     </p>
@@ -17,11 +17,11 @@ defineProps<{
         <p class="font-display text-[2rem] font-bold leading-none text-ink-950 sm:text-[2.2rem]">
           {{ value }}
         </p>
-        <p class="mt-2 max-w-[26ch] text-sm leading-6 text-ink-700">
+        <p class="mt-2 max-w-[24ch] text-sm text-ink-700">
           {{ detail }}
         </p>
       </div>
-      <span v-if="trend" class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-ink-800 sm:text-sm">
+      <span v-if="trend" class="rounded-full bg-cream-100 px-3 py-1 text-xs font-semibold text-ink-800 sm:text-sm">
         {{ trend }}
       </span>
     </div>

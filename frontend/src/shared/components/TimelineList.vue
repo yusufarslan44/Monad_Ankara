@@ -32,7 +32,7 @@ const toneMap = {
     <li
       v-for="item in items"
       :key="item.id"
-      class="surface-muted flex gap-4 p-4"
+      class="flex gap-4 rounded-[1.25rem] border border-ink-300/50 bg-white p-4"
     >
       <div :class="toneMap[item.tone]" class="grid h-11 w-11 place-items-center rounded-2xl">
         <component :is="iconMap[item.type]" class="h-5 w-5" />
