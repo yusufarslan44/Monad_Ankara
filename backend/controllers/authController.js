@@ -61,7 +61,10 @@ async function requestCode(req, res, next) {
     }
 
     // 4) 6 haneli kod uret
-    const code = String(crypto.randomInt(100000, 1000000));
+    // DEV_FIXED_CODE ayarliysa sabit kod kullanilir (gelistirme/test kolayligi).
+    const code = process.env.DEV_FIXED_CODE
+      ? String(process.env.DEV_FIXED_CODE)
+      : String(crypto.randomInt(100000, 1000000));
 
     // 5) Kaydet (15 dk TTL)
     await VerificationCode.create({
