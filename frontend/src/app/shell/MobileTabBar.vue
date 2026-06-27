@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { useRoute, RouterLink } from 'vue-router';
 import { MoreHorizontal } from 'lucide-vue-next';
-import { mobileNavigation } from '@/app/config/navigation';
+import type { NavItem } from '@/app/config/navigation';
 
-const route = useRoute();
+defineProps<{
+  items: NavItem[];
+  showMore: boolean;
+}>();
+
 const emit = defineEmits<{
   more: [];
 }>();
+
+const route = useRoute();
 </script>
 
 <template>
@@ -14,8 +20,8 @@ const emit = defineEmits<{
     class="fixed inset-x-3 bottom-3 z-40 rounded-[1.75rem] border border-white/80 bg-white/92 p-2 shadow-2xl backdrop-blur md:hidden"
     aria-label="Alt gezinme"
   >
-    <ul class="grid grid-cols-5 gap-2">
-      <li v-for="item in mobileNavigation" :key="item.label">
+    <ul class="grid gap-2" :style="{ gridTemplateColumns: `repeat(${items.length + (showMore ? 1 : 0)}, minmax(0, 1fr))` }">
+      <li v-for="item in items" :key="item.label">
         <RouterLink
           :to="item.to"
           class="focus-ring flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold transition-all duration-200 ease-[var(--ease-fluid)] active:scale-[0.98]"
@@ -31,7 +37,7 @@ const emit = defineEmits<{
           </span>
         </RouterLink>
       </li>
-      <li>
+      <li v-if="showMore">
         <button
           class="focus-ring flex min-h-11 w-full flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold text-ink-700 transition-all duration-200 ease-[var(--ease-fluid)] active:scale-[0.98]"
           @click="emit('more')"

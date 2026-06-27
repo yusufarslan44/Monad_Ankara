@@ -9,6 +9,7 @@ import PoolView from '@/features/pool/views/PoolView.vue';
 import ReputationView from '@/features/reputation/views/ReputationView.vue';
 import HistoryView from '@/features/history/views/HistoryView.vue';
 import AppLayoutView from '@/app/shell/AppLayoutView.vue';
+import { isInvestorAllowedPath } from '@/app/config/navigation';
 import { useSessionStore } from '@/stores/session';
 
 const router = createRouter({
@@ -99,13 +100,39 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const session = useSessionStore();
-  const { isAppReady, isWalletReady, bootstrapped } = storeToRefs(session);
+  const { isAppReady, isWalletReady, isInvestorMode, bootstrapped } = storeToRefs(session);
 
   if (!bootstrapped.value) {
     await session.hydrate();
   }
 
+  if (isInvestorMode.value && !isInvestorAllowedPath(to.path)) {
+    if (isWalletReady.value) {
+      return {
+        name: 'pool',
+      };
+    }
+
+    return {
+      name: 'onboarding',
+      query: { rol: 'yatirimci' },
+    };
+  }
+
   if (to.meta.requiresReady && !isAppReady.value) {
+    if (isInvestorMode.value) {
+      if (isWalletReady.value) {
+        return {
+          name: 'pool',
+        };
+      }
+
+      return {
+        name: 'onboarding',
+        query: { rol: 'yatirimci' },
+      };
+    }
+
     return {
       name: 'onboarding',
     };
@@ -121,6 +148,12 @@ router.beforeEach(async (to) => {
   if (to.name === 'onboarding' && isAppReady.value) {
     return {
       name: 'dashboard',
+    };
+  }
+
+  if (to.name === 'onboarding' && isInvestorMode.value && isWalletReady.value) {
+    return {
+      name: 'pool',
     };
   }
 

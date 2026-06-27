@@ -41,10 +41,15 @@ const pillars = [
               teminatsiz, seffaf ve sosyal guven tabanli bir deneyime donusturur.
             </p>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-              <RouterLink to="/uygulama">
+              <RouterLink to="/uygulama?mod=kayit">
                 <BaseButton>
-                  Uygulamaya gir
+                  Kayit ol
                   <ArrowRight class="h-4 w-4" />
+                </BaseButton>
+              </RouterLink>
+              <RouterLink to="/uygulama?mod=giris">
+                <BaseButton variant="ghost">
+                  Giris yap
                 </BaseButton>
               </RouterLink>
               <RouterLink to="/uygulama?rol=yatirimci">

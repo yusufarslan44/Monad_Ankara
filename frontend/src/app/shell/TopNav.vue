@@ -12,7 +12,7 @@ defineProps<{
 }>();
 
 const session = useSessionStore();
-const { identity, studentProfile, wallet } = storeToRefs(session);
+const { identity, studentProfile, wallet, isInvestorMode } = storeToRefs(session);
 
 const firstName = computed(() => studentProfile.value.name.split(' ')[0] || 'Kullanici');
 const walletLabel = computed(() => {
@@ -25,6 +25,16 @@ const walletLabel = computed(() => {
   }
 
   return formatShortAddress(wallet.value.address);
+});
+
+const identityTone = computed(() => {
+  if (isInvestorMode.value) return 'neutral';
+  return identity.value.status === 'dogrulandi' ? 'success' : 'warning';
+});
+
+const identityLabel = computed(() => {
+  if (isInvestorMode.value) return 'Yatirimci mod';
+  return identity.value.status === 'dogrulandi' ? 'Kimlik aktif' : 'Kimlik eksik';
 });
 </script>
 
@@ -41,8 +51,8 @@ const walletLabel = computed(() => {
 
       <div class="flex flex-wrap items-center gap-2.5">
         <StatusBadge
-          :tone="identity.status === 'dogrulandi' ? 'success' : 'warning'"
-          :label="identity.status === 'dogrulandi' ? 'Kimlik aktif' : 'Kimlik eksik'"
+          :tone="identityTone"
+          :label="identityLabel"
         />
         <div class="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink-300/50 bg-surface-0 px-4 py-2 text-sm font-semibold text-ink-900">
             <Wallet class="h-4 w-4 text-brand-700" />

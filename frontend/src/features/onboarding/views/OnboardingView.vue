@@ -52,6 +52,7 @@ const {
 const [code, codeAttrs] = defineCodeField('code');
 
 const isInvestorMode = computed(() => route.query.rol === 'yatirimci');
+const isLoginIntent = computed(() => route.query.mod === 'giris' && !isInvestorMode.value);
 
 const isWalletStep = computed(() => wallet.value.status !== 'bagli');
 const isIdentityStep = computed(
@@ -100,6 +101,10 @@ const walletHint = computed(() => {
 
   if (!wallet.value.isInstalled) {
     return 'Devam etmek icin MetaMask kurulumu gerekli.';
+  }
+
+  if (isLoginIntent.value) {
+    return 'Kayitli hesabinla devam etmek icin MetaMask bagla.';
   }
 
   return `${wallet.value.network} uzerinden devam edeceksin.`;
@@ -158,9 +163,17 @@ const handleWalletAction = async () => {
 };
 
 watch(
+  () => route.query.rol,
+  (rol) => {
+    session.setMode(rol === 'yatirimci' ? 'investor' : 'student');
+  },
+  { immediate: true },
+);
+
+watch(
   isAppReady,
   async (ready) => {
-    if (ready) {
+    if (ready && !isInvestorMode.value) {
       await router.replace('/uygulama/panel');
     }
   },
@@ -183,9 +196,9 @@ watch(
     <div class="mx-auto max-w-3xl">
       <section class="surface-card p-5 sm:p-7">
         <div class="space-y-3">
-          <span class="label-chip">Kayit</span>
+          <span class="label-chip">{{ isInvestorMode ? 'Yatirimci' : isLoginIntent ? 'Giris' : 'Kayit' }}</span>
           <h1 class="font-display text-[2rem] font-bold text-ink-950 sm:text-[2.5rem]">
-            {{ isInvestorMode ? 'Cuzdani bagla' : 'Kampus kimligini olustur' }}
+            {{ isInvestorMode ? 'Cuzdani bagla' : isLoginIntent ? 'Hesabina gir' : 'Kampus kimligini olustur' }}
           </h1>
         </div>
 

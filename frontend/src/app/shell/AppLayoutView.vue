@@ -8,10 +8,14 @@ import { useSessionStore } from '@/stores/session';
 const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
-const { isAppReady } = storeToRefs(session);
+const { isAppReady, isWalletReady, isInvestorMode } = storeToRefs(session);
 
-watch(isAppReady, async (ready) => {
+watch([isAppReady, isWalletReady], async ([ready, walletReady]) => {
   if (!ready && route.meta.requiresReady) {
+    await router.replace('/uygulama');
+  }
+
+  if (isInvestorMode.value && !walletReady && route.meta.requiresWallet) {
     await router.replace('/uygulama');
   }
 });

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import { ArrowUpRight, LogOut } from 'lucide-vue-next';
-import { desktopNavigation, mobileMoreNavigation } from '@/app/config/navigation';
+import { desktopNavigation, investorNavigation, mobileMoreNavigation, mobileNavigation } from '@/app/config/navigation';
 import { useSessionStore } from '@/stores/session';
 import TopNav from '@/app/shell/TopNav.vue';
 import MobileTabBar from '@/app/shell/MobileTabBar.vue';
@@ -12,42 +13,43 @@ import BaseSheet from '@/shared/components/BaseSheet.vue';
 const session = useSessionStore();
 const route = useRoute();
 const router = useRouter();
+const { isInvestorMode } = storeToRefs(session);
 const showMore = ref(false);
 
-const headingMap: Record<string, { title: string; subtitle: string }> = {
-  '/uygulama/panel': {
-    title: 'Panel',
-    subtitle: '',
-  },
-  '/uygulama/borc-al': {
-    title: 'Borc Al',
-    subtitle: '',
-  },
-  '/uygulama/odeme': {
-    title: 'Odeme',
-    subtitle: '',
-  },
-  '/uygulama/havuz': {
-    title: 'Havuz',
-    subtitle: 'Likidite kilitle ve faiz kazan',
-  },
-  '/uygulama/itibar': {
-    title: 'Itibar',
-    subtitle: '',
-  },
-  '/uygulama/gecmis': {
-    title: 'Gecmis',
-    subtitle: '',
-  },
-};
+const filteredDesktopNavigation = computed(() =>
+  isInvestorMode.value ? investorNavigation : desktopNavigation,
+);
 
-const currentHeading = computed(
-  () =>
-    headingMap[route.path] ?? {
+const filteredMobileNavigation = computed(() =>
+  isInvestorMode.value ? investorNavigation : mobileNavigation,
+);
+
+const filteredMobileMoreNavigation = computed(() =>
+  isInvestorMode.value ? [] : mobileMoreNavigation,
+);
+
+const currentHeading = computed(() => {
+  if (route.path === '/uygulama/havuz') {
+    return isInvestorMode.value
+      ? { title: 'Yatirim', subtitle: 'Likidite kilitle ve faiz kazan' }
+      : { title: 'Havuz', subtitle: 'Likidite kilitle ve faiz kazan' };
+  }
+
+  const map: Record<string, { title: string; subtitle: string }> = {
+    '/uygulama/panel': { title: 'Panel', subtitle: '' },
+    '/uygulama/borc-al': { title: 'Borc Al', subtitle: '' },
+    '/uygulama/odeme': { title: 'Odeme', subtitle: '' },
+    '/uygulama/itibar': { title: 'Itibar', subtitle: '' },
+    '/uygulama/gecmis': { title: 'Gecmis', subtitle: '' },
+  };
+
+  return (
+    map[route.path] ?? {
       title: 'KampusMON',
       subtitle: '',
-    },
-);
+    }
+  );
+});
 
 const disconnectWallet = async () => {
   await session.disconnectWallet();
@@ -72,7 +74,7 @@ const disconnectWallet = async () => {
 
           <nav class="mt-6 space-y-1.5">
             <RouterLink
-              v-for="item in desktopNavigation"
+              v-for="item in filteredDesktopNavigation"
               :key="item.label"
               :to="item.to"
               class="focus-ring flex min-h-11 items-center gap-3 rounded-2xl px-3.5 py-3 transition-colors"
@@ -83,7 +85,10 @@ const disconnectWallet = async () => {
             </RouterLink>
           </nav>
 
-          <div class="mt-6 rounded-[1.25rem] border border-ink-300/40 bg-surface-1 p-4 text-ink-900">
+          <div
+            v-if="!isInvestorMode"
+            class="mt-6 rounded-[1.25rem] border border-ink-300/40 bg-surface-1 p-4 text-ink-900"
+          >
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">Hizli islem</p>
             <p class="mt-2 font-display text-lg font-bold">Yeni borc ac</p>
             <RouterLink
@@ -111,12 +116,16 @@ const disconnectWallet = async () => {
       </main>
     </div>
 
-    <MobileTabBar @more="showMore = true" />
+    <MobileTabBar
+      :items="filteredMobileNavigation"
+      :show-more="filteredMobileMoreNavigation.length > 0"
+      @more="showMore = true"
+    />
 
     <BaseSheet :open="showMore" title="Daha fazla" @close="showMore = false">
       <div class="space-y-3">
         <RouterLink
-          v-for="item in mobileMoreNavigation"
+          v-for="item in filteredMobileMoreNavigation"
           :key="item.label"
           :to="item.to"
           class="focus-ring flex min-h-11 items-center gap-3 rounded-2xl border border-ink-300/50 bg-white px-4 py-3"

@@ -53,4 +53,26 @@ describe('router guards', () => {
 
     expect(router.currentRoute.value.name).toBe('dashboard');
   });
+
+  it('keeps investor users inside the pool flow', async () => {
+    const session = useSessionStore();
+
+    const hydratePromise = session.hydrate();
+    await vi.runAllTimersAsync();
+    await hydratePromise;
+
+    session.setMode('investor');
+
+    const walletPromise = session.connectWallet();
+    await vi.runAllTimersAsync();
+    await walletPromise;
+
+    await router.replace('/');
+    const navigation = router.push('/uygulama/panel');
+    await vi.runAllTimersAsync();
+    await navigation;
+    await flushPromises();
+
+    expect(router.currentRoute.value.name).toBe('pool');
+  });
 });

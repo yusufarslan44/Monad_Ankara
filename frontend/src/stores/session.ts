@@ -33,10 +33,13 @@ const emptyWallet: WalletState = {
   providerLabel: 'MetaMask',
 };
 
+type UserMode = 'student' | 'investor';
+
 type PersistedSession = {
   studentProfile: StudentProfile;
   identity: CampusIdentityStatus;
   wallet: WalletState;
+  mode: UserMode;
 };
 
 const loadPersistedSession = (): PersistedSession | null => {
@@ -90,6 +93,7 @@ export const useSessionStore = defineStore('session', {
     studentProfile: emptyProfile,
     identity: emptyIdentity,
     wallet: emptyWallet,
+    mode: 'student' as UserMode,
     loading: false,
     bootstrapped: false,
   }),
@@ -99,6 +103,7 @@ export const useSessionStore = defineStore('session', {
     isAppReady(): boolean {
       return this.isIdentityReady && this.isWalletReady;
     },
+    isInvestorMode: (state) => state.mode === 'investor',
   },
   actions: {
     async hydrate() {
@@ -112,6 +117,7 @@ export const useSessionStore = defineStore('session', {
         this.studentProfile = persisted?.studentProfile ?? snapshot.studentProfile;
         this.identity = persisted?.identity ?? snapshot.identity;
         this.wallet = walletSnapshot ?? persisted?.wallet ?? snapshot.wallet;
+        this.mode = persisted?.mode ?? 'student';
 
         // Cuzdan degismisse kimlik bilgilerini gecersiz kil
         if (
@@ -245,17 +251,23 @@ export const useSessionStore = defineStore('session', {
         this.persist();
       });
     },
+    setMode(mode: UserMode) {
+      this.mode = mode;
+      this.persist();
+    },
     persist() {
       persistSession({
         studentProfile: this.studentProfile,
         identity: this.identity,
         wallet: this.wallet,
+        mode: this.mode,
       });
     },
     clearSession() {
       this.studentProfile = emptyProfile;
       this.identity = emptyIdentity;
       this.wallet = emptyWallet;
+      this.mode = 'student';
       clearPersistedSession();
     },
   },
