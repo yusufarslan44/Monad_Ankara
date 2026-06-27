@@ -192,17 +192,17 @@ watch(
 </script>
 
 <template>
-  <div class="px-4 pb-32 pt-4 sm:px-5 sm:pb-36 lg:px-6">
-    <div class="mx-auto max-w-3xl">
-      <section class="surface-card p-5 sm:p-7">
+  <div class="px-4 pb-32 pt-4">
+    <div class="mx-auto max-w-[28rem]">
+      <section class="surface-card p-5">
         <div class="space-y-3">
           <span class="label-chip">{{ isInvestorMode ? 'Yatirimci' : isLoginIntent ? 'Giris' : 'Kayit' }}</span>
-          <h1 class="font-display text-[2rem] font-bold text-ink-950 sm:text-[2.5rem]">
+          <h1 class="font-display text-[2rem] font-bold text-ink-950">
             {{ isInvestorMode ? 'Cuzdani bagla' : isLoginIntent ? 'Hesabina gir' : 'Kampus kimligini olustur' }}
           </h1>
         </div>
 
-        <div class="mt-6 space-y-4 sm:space-y-5">
+        <div class="mt-6 space-y-4">
           <!-- Adim 1: Cuzdan -->
           <div v-if="isWalletStep" class="space-y-5">
             <div class="space-y-2">
@@ -244,7 +244,7 @@ watch(
               <StatusBadge v-if="submissionError" tone="danger" :label="submissionError" class="mt-2" />
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-2">
+            <div class="grid gap-4">
               <BaseFormField
                 label="Ad Soyad"
                 :error="identityErrors.name"

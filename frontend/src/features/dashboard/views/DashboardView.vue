@@ -29,13 +29,13 @@ const userPoolTotal = computed(
 </script>
 
 <template>
-  <div v-if="data" class="mx-auto max-w-4xl space-y-5">
+  <div v-if="data" class="mx-auto max-w-[28rem] space-y-5">
     <!-- Karsilama ve ana aksiyon -->
     <BaseCard class="relative overflow-hidden">
-      <div class="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div class="relative z-10 flex flex-col gap-5">
         <div>
           <p class="text-sm font-medium text-ink-700">Hos geldin, {{ firstName }}</p>
-          <h2 class="mt-2 font-display text-3xl font-bold text-ink-950 sm:text-[2.3rem]">
+          <h2 class="mt-2 font-display text-3xl font-bold text-ink-950">
             {{ hasDebt ? 'Acik borcun var.' : 'Limitin hazir.' }}
           </h2>
           <p class="mt-2 text-sm text-ink-700">
@@ -52,7 +52,7 @@ const userPoolTotal = computed(
     </BaseCard>
 
     <!-- Temel iki kart -->
-    <section class="grid gap-4 sm:grid-cols-2">
+    <section class="grid gap-4">
       <BaseCard>
         <div class="flex items-start gap-3">
           <div class="grid h-11 w-11 place-items-center rounded-2xl bg-success-100 text-success-500">
@@ -113,9 +113,9 @@ const userPoolTotal = computed(
     </BaseCard>
   </div>
 
-  <div v-else-if="isLoading" class="space-y-5">
-    <BaseCard class="min-h-32 animate-pulse bg-surface-0" />
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div v-else-if="isLoading" class="mx-auto max-w-[28rem] space-y-5">
+      <BaseCard class="min-h-32 animate-pulse bg-surface-0" />
+    <div class="grid gap-4">
       <BaseCard class="min-h-32 animate-pulse bg-surface-0" />
       <BaseCard class="min-h-32 animate-pulse bg-surface-0" />
     </div>

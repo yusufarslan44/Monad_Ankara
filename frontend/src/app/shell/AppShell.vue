@@ -58,9 +58,9 @@ const disconnectWallet = async () => {
 </script>
 
 <template>
-  <div class="min-h-dvh px-4 pb-28 pt-4 sm:px-5 lg:px-6">
-    <div class="mx-auto grid max-w-7xl gap-5 lg:grid-cols-[248px_minmax(0,1fr)]">
-      <aside class="hidden lg:block">
+  <div class="min-h-dvh px-4 pb-28 pt-4">
+    <div class="mx-auto max-w-[28rem] space-y-5">
+      <aside class="hidden">
         <div class="surface-card sticky top-4 p-5">
           <RouterLink to="/" class="flex items-center gap-3">
             <div class="grid h-12 w-12 place-items-center rounded-2xl bg-ink-950 text-lg font-bold text-white">
@@ -111,7 +111,12 @@ const disconnectWallet = async () => {
       </aside>
 
       <main class="space-y-5">
-        <TopNav :title="currentHeading.title" :subtitle="currentHeading.subtitle" />
+        <TopNav
+          :title="currentHeading.title"
+          :subtitle="currentHeading.subtitle"
+          :show-exit-action="isInvestorMode"
+          @disconnect="disconnectWallet"
+        />
         <slot />
       </main>
     </div>

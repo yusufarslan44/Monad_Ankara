@@ -12,7 +12,7 @@ const reputationGauge = computed(() => (data.value ? data.value.reputation.score
 </script>
 
 <template>
-  <div v-if="data" class="mx-auto max-w-5xl space-y-5">
+  <div v-if="data" class="mx-auto max-w-[28rem] space-y-5">
     <div class="flex items-start justify-between gap-4">
       <h2 class="font-display text-3xl font-bold text-ink-950">Itibar</h2>
       <StatusBadge
@@ -21,7 +21,7 @@ const reputationGauge = computed(() => (data.value ? data.value.reputation.score
       />
     </div>
 
-    <section class="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
+    <section class="grid gap-5">
       <CreditGauge
         :value="reputationGauge"
         label="Itibar skoru"
@@ -29,7 +29,7 @@ const reputationGauge = computed(() => (data.value ? data.value.reputation.score
       />
 
       <BaseCard>
-        <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <div class="mt-6 grid gap-4">
           <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
             <p class="text-sm text-ink-700">Skor</p>
             <p class="mt-2 font-display text-3xl font-bold text-ink-950">{{ data.reputation.score }}/100</p>
@@ -48,7 +48,7 @@ const reputationGauge = computed(() => (data.value ? data.value.reputation.score
 
     <BaseCard>
       <h2 class="font-display text-2xl font-bold text-ink-950">Rehabilitasyon</h2>
-      <div class="mt-5 grid gap-4 md:grid-cols-2">
+      <div class="mt-5 grid gap-4">
         <article class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
           <p class="font-semibold text-ink-950">Gecikme</p>
           <p class="mt-2 text-sm text-ink-700">Limit daralir, sonra yeniden toparlanma sansi acilir.</p>

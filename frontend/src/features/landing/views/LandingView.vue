@@ -27,20 +27,20 @@ const pillars = [
 </script>
 
 <template>
-  <div class="px-4 py-4 sm:px-5 lg:px-6">
-    <div class="mx-auto max-w-7xl space-y-5">
-      <section class="surface-card overflow-hidden p-6 sm:p-8 lg:p-10">
-        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-center">
+  <div class="px-4 py-4">
+    <div class="mx-auto max-w-[28rem] space-y-5">
+      <section class="surface-card overflow-hidden p-6">
+        <div class="grid gap-8">
           <div>
             <span class="label-chip">Kampus ici nano-lending ekosistemi</span>
-            <h1 class="mt-5 max-w-[12ch] font-display text-5xl font-bold text-ink-950 sm:text-6xl">
+            <h1 class="mt-5 max-w-[12ch] font-display text-5xl font-bold text-ink-950">
               500 TL'lik ihtiyac icin banka bekleme devri bitsin.
             </h1>
-            <p class="mt-5 max-w-[62ch] text-base text-ink-800 sm:text-lg">
+            <p class="mt-5 max-w-[62ch] text-base text-ink-800">
               KampusMON, universite ogrencilerinin anlik nakit ihtiyacini Monad uzerinde
               teminatsiz, seffaf ve sosyal guven tabanli bir deneyime donusturur.
             </p>
-            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div class="mt-8 flex flex-col gap-3">
               <RouterLink to="/uygulama?mod=kayit">
                 <BaseButton>
                   Kayit ol
@@ -62,7 +62,7 @@ const pillars = [
                 <BaseButton variant="ghost">Neden Monad?</BaseButton>
               </a>
             </div>
-            <dl class="mt-10 grid gap-4 sm:grid-cols-3">
+            <dl class="mt-10 grid gap-4">
               <div class="surface-muted p-4">
                 <dt class="text-sm font-semibold uppercase tracking-[0.16em] text-ink-700">Onay hizi</dt>
                 <dd class="mt-2 font-display text-3xl font-bold text-ink-950">~1 sn</dd>
@@ -99,7 +99,7 @@ const pillars = [
         </div>
       </section>
 
-      <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section class="grid gap-4">
         <article
           v-for="pillar in pillars"
           :key="pillar.title"
@@ -113,10 +113,10 @@ const pillars = [
         </article>
       </section>
 
-      <section class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_420px]">
-        <div class="surface-card p-6 sm:p-8">
+      <section class="grid gap-5">
+        <div class="surface-card p-6">
           <span class="label-chip">Nasil calisir?</span>
-          <div class="mt-6 grid gap-4 md:grid-cols-2">
+          <div class="mt-6 grid gap-4">
             <article class="surface-muted p-5">
               <p class="text-sm uppercase tracking-[0.16em] text-ink-700">1</p>
               <h3 class="mt-2 font-semibold text-ink-950">Kampus kimligi kurulur</h3>
@@ -140,7 +140,7 @@ const pillars = [
           </div>
         </div>
 
-        <aside id="neden-monad" class="surface-card p-6 sm:p-8">
+        <aside id="neden-monad" class="surface-card p-6">
           <span class="label-chip">Neden Monad?</span>
           <h2 class="mt-5 font-display text-3xl font-bold text-ink-950">Nano-islem ekonomisi burada bozulmuyor.</h2>
           <ul class="mt-5 space-y-4 text-sm text-ink-700">

@@ -104,8 +104,8 @@ const purposeOptions = ['Kantin ve ulasim', 'Yemek', 'Kirtasiye', 'Acil ihtiyac'
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl space-y-5">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+  <div class="mx-auto max-w-[28rem] space-y-5">
+    <div class="flex flex-col gap-4">
       <h2 class="font-display text-3xl font-bold text-ink-950">Yeni kredi istegi</h2>
       <StatusBadge
         :tone="isGuaranteeRequired ? 'warning' : 'success'"
@@ -113,12 +113,12 @@ const purposeOptions = ['Kantin ve ulasim', 'Yemek', 'Kirtasiye', 'Acil ihtiyac'
       />
     </div>
 
-    <section class="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_320px]">
+    <section class="grid gap-5">
       <BaseCard>
         <form class="space-y-6" @submit="onSubmit">
           <div class="space-y-3">
             <p class="font-semibold text-ink-950">Ne kadar lazim?</p>
-            <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div class="grid gap-3">
               <BaseFormField
                 label="Tutar (MON)"
                 :error="errors.amountMON"
@@ -133,7 +133,7 @@ const purposeOptions = ['Kantin ve ulasim', 'Yemek', 'Kirtasiye', 'Acil ihtiyac'
                   class="focus-ring min-h-12 w-full rounded-2xl border border-ink-300/50 bg-white px-4 py-3 text-[1.1rem] font-semibold text-ink-950"
                 />
               </BaseFormField>
-              <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+              <div class="grid grid-cols-2 gap-2">
                 <button
                   v-for="value in quickAmounts"
                   :key="value"
@@ -246,7 +246,7 @@ const purposeOptions = ['Kantin ve ulasim', 'Yemek', 'Kirtasiye', 'Acil ihtiyac'
       description="Islem mock adapter uzerinden paneline islendi. Dashboard ve gecmis akisi guncellendi."
       @close="successOpen = false"
     >
-      <div class="flex flex-col gap-3 sm:flex-row">
+      <div class="flex flex-col gap-3">
         <RouterLink to="/uygulama/panel">
           <BaseButton>Panele don</BaseButton>
         </RouterLink>

@@ -120,8 +120,8 @@ const chooseLock = (days: number) => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl space-y-5">
-    <div v-if="isLoading" class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+  <div class="mx-auto max-w-[28rem] space-y-5">
+    <div v-if="isLoading" class="grid gap-4">
       <BaseCard v-for="i in 5" :key="i" class="h-28 animate-pulse bg-surface-0" />
     </div>
 
@@ -157,7 +157,7 @@ const chooseLock = (days: number) => {
         </div>
       </BaseCard>
 
-      <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <section class="grid gap-4">
         <BaseCard>
           <div class="flex items-start gap-3">
             <div class="grid h-10 w-10 place-items-center rounded-2xl bg-brand-100 text-brand-700">
@@ -223,7 +223,7 @@ const chooseLock = (days: number) => {
         </BaseCard>
       </section>
 
-      <section class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <section class="grid gap-5">
         <BaseCard>
           <h2 class="font-display text-2xl font-bold text-ink-950">Yatirimlarin</h2>
           <div v-if="data.userDeposits.length" class="mt-5 space-y-3">
@@ -242,7 +242,7 @@ const chooseLock = (days: number) => {
                   :label="deposit.status"
                 />
               </div>
-              <div class="mt-4 grid gap-2 sm:grid-cols-3">
+              <div class="mt-4 grid gap-2">
                 <div>
                   <p class="text-xs font-semibold uppercase tracking-wider text-ink-700">Anapara</p>
                   <p class="font-display text-xl font-bold text-ink-950">
@@ -307,7 +307,7 @@ const chooseLock = (days: number) => {
 
             <div>
               <p class="mb-2 text-sm font-semibold text-ink-900">Kilitleme suresi</p>
-              <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div class="grid grid-cols-2 gap-2">
                 <button
                   v-for="option in lockOptions"
                   :key="option.days"
@@ -352,7 +352,7 @@ const chooseLock = (days: number) => {
         v-if="selectedDeposit"
         class="rounded-[1.25rem] border border-success-200 bg-success-50/50"
       >
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-4">
           <div>
             <p class="font-semibold text-ink-950">Yatirimi coz ve cek</p>
             <p class="mt-1 text-sm text-ink-700">

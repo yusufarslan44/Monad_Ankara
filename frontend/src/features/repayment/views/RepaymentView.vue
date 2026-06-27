@@ -72,8 +72,8 @@ const quickAmounts = computed(() => {
 </script>
 
 <template>
-  <div v-if="dashboard" class="mx-auto max-w-5xl space-y-5">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+  <div v-if="dashboard" class="mx-auto max-w-[28rem] space-y-5">
+    <div class="flex flex-col gap-4">
       <h2 class="font-display text-3xl font-bold text-ink-950">Parcali odeme</h2>
       <StatusBadge
         :tone="dashboard.loanPosition.outstandingMON > 3 ? 'warning' : 'success'"
@@ -81,12 +81,12 @@ const quickAmounts = computed(() => {
       />
     </div>
 
-    <section class="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_320px]">
+    <section class="grid gap-5">
       <BaseCard>
         <form class="space-y-6" @submit="onSubmit">
           <div class="space-y-3">
             <p class="font-semibold text-ink-950">Bugun ne kadar odeyeceksin?</p>
-            <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div class="grid gap-3">
               <BaseFormField
                 label="Odeme tutari (MON)"
                 :error="errors.amountMON"
@@ -101,7 +101,7 @@ const quickAmounts = computed(() => {
                   class="focus-ring min-h-12 w-full rounded-2xl border border-ink-300/50 bg-white px-4 py-3 text-[1.1rem] font-semibold text-ink-950"
                 />
               </BaseFormField>
-              <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+              <div class="grid grid-cols-2 gap-2">
                 <button
                   v-for="value in quickAmounts"
                   :key="value"
@@ -115,7 +115,7 @@ const quickAmounts = computed(() => {
             </div>
           </div>
 
-          <div class="grid gap-3 md:grid-cols-2">
+          <div class="grid gap-3">
             <div class="rounded-[1.25rem] border border-ink-300/50 bg-white p-4">
               <p class="text-sm text-ink-700">Tahmini yeni limit</p>
               <p class="mt-2 font-display text-3xl font-bold text-ink-950">{{ formatMON(projectedAvailable) }} MON</p>
@@ -191,7 +191,7 @@ const quickAmounts = computed(() => {
       description="Parcali odeme panel ve gecmis akisina islendi."
       @close="successOpen = false"
     >
-      <div class="flex flex-col gap-3 sm:flex-row">
+      <div class="flex flex-col gap-3">
         <RouterLink to="/uygulama/panel">
           <BaseButton>Panele don</BaseButton>
         </RouterLink>

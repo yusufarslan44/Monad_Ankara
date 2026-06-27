@@ -7,7 +7,7 @@ const { data } = useHistoryQuery();
 </script>
 
 <template>
-  <div v-if="data" class="mx-auto max-w-4xl space-y-5">
+  <div v-if="data" class="mx-auto max-w-[28rem] space-y-5">
     <h2 class="font-display text-3xl font-bold text-ink-950">Tum hareketler</h2>
 
     <BaseCard>
