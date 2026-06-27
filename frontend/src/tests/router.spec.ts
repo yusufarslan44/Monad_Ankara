@@ -29,17 +29,21 @@ describe('router guards', () => {
     await vi.runAllTimersAsync();
     await hydratePromise;
 
-    const emailPromise = session.submitCampusEmail(
+    const walletPromise = session.connectWallet();
+    await vi.runAllTimersAsync();
+    await walletPromise;
+
+    const verificationPromise = session.startVerification(
       'Derya Kaya',
       'Yildiz Teknik Universitesi',
       'derya@std.yildiz.edu.tr',
     );
     await vi.runAllTimersAsync();
-    await emailPromise;
+    await verificationPromise;
 
-    const walletPromise = session.connectWallet();
+    const codePromise = session.verifyCode('123456');
     await vi.runAllTimersAsync();
-    await walletPromise;
+    await codePromise;
 
     await router.replace('/');
     const navigation = router.push('/uygulama');

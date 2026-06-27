@@ -6,6 +6,11 @@ export const onboardingFormSchema = z.object({
   email: z.string().email('Gecerli bir e-posta gir.').refine((value) => value.endsWith('.edu.tr'), {
     message: 'Kampus e-postasi .edu.tr ile bitmeli.',
   }),
+  referralCode: z.string().optional(),
+});
+
+export const verificationCodeSchema = z.object({
+  code: z.string().min(6, '6 haneli kodu gir.').max(6, '6 haneli kodu gir.'),
 });
 
 export const loanFormSchema = z.object({
