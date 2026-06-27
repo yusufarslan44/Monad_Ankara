@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const { ethers } = require("ethers");
 const User = require("../models/User");
 const VerificationCode = require("../models/VerificationCode");
 const chainService = require("../services/chainService");
@@ -23,6 +24,12 @@ async function requestCode(req, res, next) {
       return res
         .status(400)
         .json({ success: false, error: "address ve email zorunludur" });
+    }
+
+    if (!ethers.isAddress(address)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Gecersiz cuzdan adresi" });
     }
 
     const normalizedAddress = String(address).toLowerCase().trim();
@@ -87,6 +94,12 @@ async function verifyCode(req, res, next) {
       return res
         .status(400)
         .json({ success: false, error: "email, code ve address zorunludur" });
+    }
+
+    if (!ethers.isAddress(address)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Gecersiz cuzdan adresi" });
     }
 
     const normalizedAddress = String(address).toLowerCase().trim();
