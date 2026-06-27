@@ -108,8 +108,18 @@ const onSubmit = async (event: Event) => {
     return;
   }
 
+  const requested = safeValues.amountMON ?? 0;
+  const available = dashboard.value?.creditLimit.availableMON ?? 0;
+
+  // Zincire gondermeden once limiti kontrol et (bosa gas harcamayi onler)
+  if (requested > available) {
+    submitError.value = `Bu tutar kredi limitini asiyor. Kullanilabilir limit: ${available} MON.`;
+    showGuaranteeLink.value = true;
+    return;
+  }
+
   await mutation.mutateAsync({
-    amountMON: safeValues.amountMON ?? 0,
+    amountMON: requested,
     purpose: safeValues.purpose ?? '',
   });
 };

@@ -211,22 +211,24 @@ async function getDashboardSnapshot(address) {
   let contractData;
   try {
     const contract = getLendingPoolContract();
-    const [creditLimitWei, borrowedWei, repayCount, depositWei, totalDepositedWei, totalBorrowedWei, availableLiquidityWei, apyBpsWei] = await Promise.all([
-      contract.creditLimit(normalizedAddress),
-      contract.borrowed(normalizedAddress),
-      contract.repayCount(normalizedAddress),
-      contract.deposits(normalizedAddress),
-      contract.totalDeposited(),
-      contract.totalBorrowed(),
-      contract.availableLiquidity(),
-      contract.ANNUAL_RATE_BPS(),
-    ]);
-
+    const creditLimitWei = await contract.creditLimit(normalizedAddress);
+    const borrowedWei = await contract.borrowed(normalizedAddress);
+    const repayCount = await contract.repayCount(normalizedAddress);
+    const depositWei = await contract.deposits(normalizedAddress);
+    const totalDepositedWei = await contract.totalDeposited();
+    const totalBorrowedWei = await contract.totalBorrowed();
+    const availableLiquidityWei = await contract.availableLiquidity();
+    const apyBpsWei = await contract.ANNUAL_RATE_BPS();
+    const baseCreditWei = await contract.BASE_CREDIT();
     const currentDebtWei = await contract.currentDebt(normalizedAddress);
     const principalMON = toMON(borrowedWei);
     const outstandingMON = toMON(currentDebtWei);
     const accruedInterestMON = Number(Math.max(0, outstandingMON - principalMON).toFixed(4));
-    const creditLimitMON = toMON(creditLimitWei);
+    const baseCreditMON = toMON(baseCreditWei);
+    // Yeni ogrencinin zincirdeki limiti 0'dir; ilk borc'ta kontrat BASE_CREDIT atar.
+    // Bu yuzden gercek kullanilabilir limit = mevcut limit veya (limit 0 ise) BASE_CREDIT.
+    const effectiveLimitMON = toMON(creditLimitWei) > 0 ? toMON(creditLimitWei) : baseCreditMON;
+    const creditLimitMON = effectiveLimitMON;
     const depositMON = toMON(depositWei);
     const totalDepositedMON = toMON(totalDepositedWei);
     const totalBorrowedMON = toMON(totalBorrowedWei);
@@ -239,11 +241,11 @@ async function getDashboardSnapshot(address) {
 
     contractData = {
       creditLimit: {
-        totalMON: creditLimitMON || 12.5,
+        totalMON: creditLimitMON,
         availableMON: Number(Math.max(0, creditLimitMON - principalMON).toFixed(4)),
         guaranteedMON: 0,
         scoreBand: creditLimitMON > 0 ? "Baslangic+" : "-",
-        nextUnlockMON: 2.4,
+        nextUnlockMON: 0,
       },
       loanPosition: {
         principalMON,
