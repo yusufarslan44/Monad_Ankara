@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -12,6 +12,7 @@ import BaseFormField from '@/shared/components/BaseFormField.vue';
 import StatusBadge from '@/shared/components/StatusBadge.vue';
 
 const router = useRouter();
+const route = useRoute();
 const session = useSessionStore();
 const { identity, wallet, loading, isAppReady } = storeToRefs(session);
 
@@ -50,14 +51,22 @@ const {
 
 const [code, codeAttrs] = defineCodeField('code');
 
+const isInvestorMode = computed(() => route.query.rol === 'yatirimci');
+
 const isWalletStep = computed(() => wallet.value.status !== 'bagli');
-const isIdentityStep = computed(() => wallet.value.status === 'bagli' && identity.value.status === 'baslamadi');
+const isIdentityStep = computed(
+  () => !isInvestorMode.value && wallet.value.status === 'bagli' && identity.value.status === 'baslamadi',
+);
 const isVerificationStep = computed(
-  () => wallet.value.status === 'bagli' && identity.value.status === 'dogrulaniyor',
+  () => !isInvestorMode.value && wallet.value.status === 'bagli' && identity.value.status === 'dogrulaniyor',
+);
+
+const isInvestorReady = computed(
+  () => isInvestorMode.value && wallet.value.status === 'bagli' && wallet.value.isSupportedNetwork !== false,
 );
 
 const currentStep = computed(() => {
-  if (isAppReady.value) {
+  if (isAppReady.value || isInvestorReady.value) {
     return 3;
   }
 
@@ -96,12 +105,19 @@ const walletHint = computed(() => {
   return `${wallet.value.network} uzerinden devam edeceksin.`;
 });
 
-const steps = [
-  { label: 'Cuzdan' },
-  { label: 'Kimlik' },
-  { label: 'Dogrulama' },
-  { label: 'Panel' },
-];
+const steps = computed(() =>
+  isInvestorMode.value
+    ? [
+        { label: 'Cuzdan' },
+        { label: 'Havuz' },
+      ]
+    : [
+        { label: 'Cuzdan' },
+        { label: 'Kimlik' },
+        { label: 'Dogrulama' },
+        { label: 'Panel' },
+      ],
+);
 
 const onIdentitySubmit = handleIdentitySubmit(async (values) => {
   clearSubmissionError();
@@ -150,6 +166,16 @@ watch(
   },
   { immediate: true },
 );
+
+watch(
+  isInvestorReady,
+  async (ready) => {
+    if (ready) {
+      await router.replace('/uygulama/havuz');
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -159,7 +185,7 @@ watch(
         <div class="space-y-3">
           <span class="label-chip">Kayit</span>
           <h1 class="font-display text-[2rem] font-bold text-ink-950 sm:text-[2.5rem]">
-            Kampus kimligini olustur
+            {{ isInvestorMode ? 'Cuzdani bagla' : 'Kampus kimligini olustur' }}
           </h1>
         </div>
 
@@ -320,7 +346,7 @@ watch(
 
     <nav class="fixed inset-x-3 bottom-3 z-40" aria-label="Kayit adimlari">
       <div class="mx-auto max-w-xl rounded-[1.75rem] border border-white/80 bg-white/92 p-2 shadow-2xl backdrop-blur">
-        <ol class="grid grid-cols-4 gap-2">
+        <ol :class="isInvestorMode ? 'grid-cols-2' : 'grid-cols-4'" class="grid gap-2">
           <li v-for="(step, index) in steps" :key="step.label">
             <div
               :aria-current="index === currentStep ? 'step' : undefined"

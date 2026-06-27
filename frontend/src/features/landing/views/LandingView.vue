@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight, Coins, ShieldCheck, TimerReset, WalletCards } from 'lucide-vue-next';
+import { ArrowRight, Coins, PiggyBank, ShieldCheck, TimerReset, WalletCards } from 'lucide-vue-next';
 import BaseButton from '@/shared/components/BaseButton.vue';
 
 const pillars = [
@@ -47,6 +47,12 @@ const pillars = [
                   <ArrowRight class="h-4 w-4" />
                 </BaseButton>
               </RouterLink>
+              <RouterLink to="/uygulama?rol=yatirimci">
+                <BaseButton variant="secondary">
+                  Yatirimci girisi
+                  <PiggyBank class="h-4 w-4" />
+                </BaseButton>
+              </RouterLink>
               <a href="#neden-monad">
                 <BaseButton variant="ghost">Neden Monad?</BaseButton>
               </a>
@@ -80,8 +86,8 @@ const pillars = [
                 <p class="mt-2 font-display text-3xl font-bold">5.8 MON</p>
               </div>
               <div class="rounded-3xl bg-brand-600/30 p-4">
-                <p class="text-sm text-white/60">Kefalet tamponu</p>
-                <p class="mt-2 font-display text-3xl font-bold">2.2 MON</p>
+                <p class="text-sm text-white/60">Havuz yatirimi</p>
+                <p class="mt-2 font-display text-3xl font-bold">2.0 MON</p>
               </div>
             </div>
           </div>

@@ -68,7 +68,7 @@ const router = createRouter({
           component: PoolView,
           meta: {
             layout: 'app',
-            requiresReady: true,
+            requiresWallet: true,
             pageOrder: 4,
           },
         },
@@ -108,6 +108,13 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresReady && !isAppReady.value) {
     return {
       name: 'onboarding',
+    };
+  }
+
+  if (to.meta.requiresWallet && !isWalletReady.value) {
+    return {
+      name: 'onboarding',
+      query: { rol: 'yatirimci' },
     };
   }
 
