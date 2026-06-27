@@ -90,10 +90,18 @@ const depositMutation = useMutation({
       queryClient.invalidateQueries({ queryKey: ['history'] }),
     ]);
   },
+  onError: (err: unknown) => {
+    const message = err instanceof Error ? err.message : 'Islem basarisiz.';
+    depositErrorMessage.value = message.includes('User rejected') || message.includes('4001')
+      ? 'MetaMask isteği reddedildi.'
+      : message.includes('insufficient') || message.includes('Insufficient')
+        ? 'Yetersiz bakiye.'
+        : message;
+  },
 });
 
 const withdrawMutation = useMutation({
-  mutationFn: (depositId: string) => dataAdapter.withdraw(depositId),
+  mutationFn: (input: { amountMON: number }) => dataAdapter.withdraw(input),
   onSuccess: async () => {
     selectedDepositId.value = null;
     await Promise.all([
@@ -102,12 +110,21 @@ const withdrawMutation = useMutation({
       queryClient.invalidateQueries({ queryKey: ['history'] }),
     ]);
   },
+  onError: (err: unknown) => {
+    const message = err instanceof Error ? err.message : 'Islem basarisiz.';
+    withdrawErrorMessage.value = message.includes('User rejected') || message.includes('4001')
+      ? 'MetaMask isteği reddedildi.'
+      : message;
+  },
 });
 
 const isDepositing = computed(() => depositMutation.isPending.value);
 const isWithdrawing = computed(() => withdrawMutation.isPending.value);
+const depositErrorMessage = ref('');
+const withdrawErrorMessage = ref('');
 
 const onDeposit = handleSubmit(async (formValues) => {
+  depositErrorMessage.value = '';
   await depositMutation.mutateAsync({
     amountMON: Number(formValues.amountMON),
     lockDays: Number(formValues.lockDays),
@@ -340,9 +357,12 @@ const chooseLock = (days: number) => {
               <p class="text-sm text-ink-700">Vade sonunda anapara + faiz iade edilir.</p>
             </div>
 
+            <p v-if="depositErrorMessage" class="text-sm font-medium text-danger-500">
+              {{ depositErrorMessage }}
+            </p>
             <BaseButton :disabled="isDepositing" type="submit" block>
-              Havuza yatir
-              <ArrowRight class="h-4 w-4" />
+              {{ isDepositing ? 'MetaMask onay bekleniyor...' : 'Havuza yatir' }}
+              <ArrowRight v-if="!isDepositing" class="h-4 w-4" />
             </BaseButton>
           </form>
         </BaseCard>
@@ -360,9 +380,15 @@ const chooseLock = (days: number) => {
               {{ formatYieldMON(selectedDeposit.projectedInterestMON) }} MON faiz iade alinacak.
             </p>
           </div>
+          <p v-if="withdrawErrorMessage" class="text-sm font-medium text-danger-500">
+            {{ withdrawErrorMessage }}
+          </p>
           <div class="flex gap-3">
-            <BaseButton :disabled="isWithdrawing" @click="withdrawMutation.mutate(selectedDeposit.id)">
-              Onayla
+            <BaseButton
+              :disabled="isWithdrawing"
+              @click="withdrawMutation.mutate({ amountMON: selectedDeposit.amountMON })"
+            >
+              {{ isWithdrawing ? 'MetaMask onay bekleniyor...' : 'Onayla' }}
             </BaseButton>
             <BaseButton variant="ghost" @click="selectedDepositId = null">Vazgec</BaseButton>
           </div>
