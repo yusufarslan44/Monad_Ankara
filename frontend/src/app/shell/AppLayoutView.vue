@@ -25,7 +25,7 @@ watch([isAppReady, isWalletReady], async ([ready, walletReady]) => {
   <AppShell v-if="route.meta.layout === 'app'">
     <RouterView />
   </AppShell>
-  <div v-else class="min-h-dvh">
+  <div v-else class="min-h-full">
     <RouterView />
   </div>
 </template>

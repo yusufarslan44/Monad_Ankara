@@ -53,7 +53,7 @@ const disconnectWallet = async () => {
 </script>
 
 <template>
-  <div class="min-h-dvh px-4 pb-28 pt-4">
+  <div class="min-h-full px-4 pb-28 pt-4">
     <div class="mx-auto max-w-[24rem] space-y-4">
       <main class="space-y-5">
         <TopNav

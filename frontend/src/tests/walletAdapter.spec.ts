@@ -84,6 +84,7 @@ const loadWalletAdapter = async (): Promise<WalletAdapterModule> => {
 
 describe('walletAdapter with real path (bypass test mock)', () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.spyOn(window.localStorage, 'getItem').mockReturnValue(null);
     vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {});
     vi.spyOn(window.localStorage, 'removeItem').mockImplementation(() => {});
@@ -162,5 +163,26 @@ describe('walletAdapter with real path (bypass test mock)', () => {
 
     const result = await walletAdapter.hydrate();
     expect((result as WalletState).isSupportedNetwork).toBe(true);
+  });
+
+  it('opens MetaMask mobile deeplink when provider is unavailable on mobile', async () => {
+    vi.stubEnv('VITE_METAMASK_DAPP_URL', 'https://campusmon.example/uygulama');
+    Object.defineProperty(window.navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)',
+      configurable: true,
+    });
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const { walletAdapter } = await loadWalletAdapter();
+
+    (window as unknown as Window & { ethereum?: MockProvider }).ethereum = undefined;
+
+    const result = await walletAdapter.connect();
+
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://metamask.app.link/dapp/campusmon.example%2Fuygulama',
+      '_self',
+    );
+    expect(result.wallet.status).toBe('bagli-degil');
+    expect(result.wallet.error).toContain('MetaMask mobil aciliyor');
   });
 });

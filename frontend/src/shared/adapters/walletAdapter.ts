@@ -22,6 +22,8 @@ type BrowserEthereum = EthereumProvider & {
 type WalletListener = (wallet: WalletState) => void;
 
 const DISCONNECT_KEY = 'campusmon.wallet.disconnected';
+const MOBILE_USER_AGENT_PATTERN = /android|iphone|ipad|ipod/i;
+const MOBILE_DEEPLINK_BASE = 'https://metamask.app.link/dapp/';
 const IS_TEST =
   import.meta.env.MODE === 'test' || import.meta.env.VITEST === 'true';
 
@@ -43,6 +45,55 @@ const getMetaMaskProvider = (): EthereumProvider | undefined => {
   }
 
   return ethereum.isMetaMask ? ethereum : undefined;
+};
+
+const getMetaMaskMobileDappUrl = () => {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  const configuredUrl = String(import.meta.env.VITE_METAMASK_DAPP_URL ?? '').trim();
+
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
+  return `${window.location.origin}${window.location.pathname}${window.location.search}${window.location.hash}`;
+};
+
+const isLocalhostUrl = (value: string) => {
+  try {
+    const url = new URL(value);
+    return ['localhost', '127.0.0.1', '0.0.0.0'].includes(url.hostname);
+  } catch {
+    return false;
+  }
+};
+
+export const isMobileMetaMaskEnvironment = () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return MOBILE_USER_AGENT_PATTERN.test(window.navigator.userAgent);
+};
+
+const getMetaMaskMobileDeeplink = () => {
+  const dappUrl = getMetaMaskMobileDappUrl();
+
+  if (!dappUrl || isLocalhostUrl(dappUrl)) {
+    return null;
+  }
+
+  return `${MOBILE_DEEPLINK_BASE}${encodeURIComponent(dappUrl.replace(/^https?:\/\//, ''))}`;
+};
+
+const getMobileWalletUnavailableMessage = () => {
+  if (String(import.meta.env.VITE_METAMASK_DAPP_URL ?? '').trim()) {
+    return 'MetaMask mobil uygulamasi ile devam etmek icin baglan butonuna dokun.';
+  }
+
+  return 'MetaMask mobil baglantisi icin VITE_METAMASK_DAPP_URL ile erisilebilir bir adres tanimla.';
 };
 
 const isManuallyDisconnected = () => {
@@ -243,7 +294,9 @@ export const walletAdapter = {
     if (!provider) {
       return buildWalletState({
         isInstalled: false,
-        error: 'MetaMask bulunamadi.',
+        error: isMobileMetaMaskEnvironment()
+          ? getMobileWalletUnavailableMessage()
+          : 'MetaMask bulunamadi.',
       });
     }
 
@@ -257,6 +310,28 @@ export const walletAdapter = {
     const provider = getMetaMaskProvider();
 
     if (!provider) {
+      if (isMobileMetaMaskEnvironment()) {
+        const deeplink = getMetaMaskMobileDeeplink();
+
+        if (deeplink && typeof window !== 'undefined') {
+          window.open(deeplink, '_self');
+
+          return getDisconnectedSnapshot(
+            buildWalletState({
+              isInstalled: false,
+              error: 'MetaMask mobil aciliyor. Baglanti tamamlaninca uygulamaya geri don.',
+            }),
+          );
+        }
+
+        return getDisconnectedSnapshot(
+          buildWalletState({
+            isInstalled: false,
+            error: getMobileWalletUnavailableMessage(),
+          }),
+        );
+      }
+
       return getDisconnectedSnapshot(
         buildWalletState({
           isInstalled: false,

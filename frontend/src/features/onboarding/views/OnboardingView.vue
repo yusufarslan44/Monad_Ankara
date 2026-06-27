@@ -6,6 +6,7 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { ArrowRight, Mail, ShieldCheck, Wallet } from 'lucide-vue-next';
 import { useSessionStore } from '@/stores/session';
+import { isMobileMetaMaskEnvironment } from '@/shared/adapters/walletAdapter';
 import { onboardingFormSchema, verificationCodeSchema } from '@/shared/lib/formSchemas';
 import BaseButton from '@/shared/components/BaseButton.vue';
 import BaseFormField from '@/shared/components/BaseFormField.vue';
@@ -53,6 +54,7 @@ const [code, codeAttrs] = defineCodeField('code');
 
 const isInvestorMode = computed(() => route.query.rol === 'yatirimci');
 const isLoginIntent = computed(() => route.query.mod === 'giris' && !isInvestorMode.value);
+const isMobileMetaMaskFlow = computed(() => isMobileMetaMaskEnvironment() && !wallet.value.isInstalled);
 
 const isWalletStep = computed(() => wallet.value.status !== 'bagli');
 const isIdentityStep = computed(
@@ -83,6 +85,10 @@ const currentStep = computed(() => {
 });
 
 const walletButtonLabel = computed(() => {
+  if (isMobileMetaMaskFlow.value) {
+    return 'MetaMask mobilde ac';
+  }
+
   if (!wallet.value.isInstalled) {
     return 'MetaMask kur';
   }
@@ -100,6 +106,10 @@ const walletHint = computed(() => {
   }
 
   if (!wallet.value.isInstalled) {
+    if (isMobileMetaMaskFlow.value) {
+      return 'MetaMask mobil uygulamasinda acarak baglan. Gerekirse public dapp URL ayarini kullan.';
+    }
+
     return 'Devam etmek icin MetaMask kurulumu gerekli.';
   }
 
@@ -148,7 +158,7 @@ const onCodeSubmit = handleCodeSubmit(async (values) => {
 const handleWalletAction = async () => {
   clearSubmissionError();
 
-  if (!wallet.value.isInstalled) {
+  if (!wallet.value.isInstalled && !isMobileMetaMaskFlow.value) {
     if (typeof window !== 'undefined') {
       window.open('https://metamask.io/download/', '_blank', 'noopener,noreferrer');
     }
