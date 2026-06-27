@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/auth");
 const referralRoutes = require("./routes/referral");
 const dashboardRoutes = require("./routes/dashboard");
+const poolRoutes = require("./routes/pool");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -24,6 +25,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/referral", referralRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/pool", poolRoutes);
 
 // ─── Global hata yonetimi (en son) ──────────────────────────────────────────
 app.use(errorHandler);

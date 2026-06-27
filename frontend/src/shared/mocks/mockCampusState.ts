@@ -131,6 +131,7 @@ const createInitialState = (): MockCampusState => ({
     },
   ],
   poolPosition: {
+    walletBalanceMON: 12.34,
     totalDepositedMON: 24.5,
     totalBorrowedMON: 8.2,
     availableLiquidityMON: 16.3,

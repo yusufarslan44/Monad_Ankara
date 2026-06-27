@@ -1,4 +1,5 @@
 import { dashboardApi } from '@/shared/adapters/dashboardApi';
+import { poolApi } from '@/shared/adapters/poolApi';
 import type { PoolDepositInput } from '@/shared/types/domain';
 import { mockCampusApi } from '@/shared/mocks/mockCampusState';
 
@@ -24,9 +25,7 @@ export const dataAdapter = {
       ? mockCampusApi.getHistorySnapshot()
       : dashboardApi.getDashboardSnapshot(withAddress(address)).then((snapshot) => ({ items: snapshot.activity })),
   getPoolSnapshot: (address?: string) =>
-    IS_TEST
-      ? mockCampusApi.getPoolSnapshot()
-      : dashboardApi.getDashboardSnapshot(withAddress(address)).then((snapshot) => snapshot.poolPosition),
+    IS_TEST ? mockCampusApi.getPoolSnapshot() : poolApi.getPoolSnapshot(withAddress(address)),
   getPoolQuote: (amountMON: number, lockDays: number) => mockCampusApi.getPoolQuote(amountMON, lockDays),
   deposit: (input: PoolDepositInput) => mockCampusApi.deposit(input),
   withdraw: (depositId: string) => mockCampusApi.withdraw(depositId),

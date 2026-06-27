@@ -99,7 +99,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const session = useSessionStore();
-  const { isAppReady, bootstrapped } = storeToRefs(session);
+  const { isAppReady, isWalletReady, bootstrapped } = storeToRefs(session);
 
   if (!bootstrapped.value) {
     await session.hydrate();

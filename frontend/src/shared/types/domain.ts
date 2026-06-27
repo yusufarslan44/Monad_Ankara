@@ -51,12 +51,14 @@ export interface PoolDeposit {
 }
 
 export interface PoolSnapshot {
+  walletBalanceMON: number;
   totalDepositedMON: number;
   totalBorrowedMON: number;
   availableLiquidityMON: number;
   userDeposits: PoolDeposit[];
   globalApyBps: number;
   projectedInterestMON: number;
+  fallback?: boolean;
 }
 
 export interface ReputationSnapshot {
