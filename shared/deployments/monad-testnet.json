@@ -1,11 +1,11 @@
 {
   "chainId": 10143,
-  "deployedAt": "deploy.sh çalıştırıldığında otomatik güncellenir",
-  "deployer": "",
-  "txHash": "",
-  "block": 0,
+  "deployedAt": "2026-06-27T12:02:12Z",
+  "deployer": "0x10562c789bb833c1930cdc7115d4fc0c4d32ba73",
+  "txHash": "0x6870cc2f10f93bfa4fdbfb73c8ee2189ebe2afaa59357763e6812dd4efec3b8e",
+  "block": 40894033,
   "contracts": {
-    "StudentID": "deploy sonrası buraya gelir",
-    "LendingPool": "deploy sonrası buraya gelir"
+    "StudentID": "0x92ceCB9d264C647c3627EdD0102E9e1e9677cC95",
+    "LendingPool": "0x37431D947061Cc9616A1f16A86016aEb307Cec6a"
   }
 }
